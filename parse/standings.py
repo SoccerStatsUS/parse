@@ -1,21 +1,13 @@
-
-
-# Process a variety of standings files. 
+# Process standings files. 
 
 # Excel style:
 # Houston Stars	North American Soccer League	1968	Gulf Division	32	14	6	12	150	58	41			
+
 # Wikipedia Style
 # 3       Moctezuma       18      9       3       6       43      34      21
 
 import codecs
 import os
-
-
-# Definitely need to remove this.
-DIR = '/home/chris/www/soccerdata/data/'
-
-if not os.path.exists(DIR):
-    DIR = "/Users/chrisedgemon/www/soccerdata/data/"
 
 
 def int_or_none(e):
@@ -28,11 +20,10 @@ def int_or_none(e):
     return None
 
 
-
-def process_excel_standings(filename):
+def process_excel_standings(p):
     # Load standings from standings file.
 
-    p = os.path.join(DIR, "standings", filename)
+    #p = os.path.join(DIR, "standings", filename)
     f = open(p)
     lines = f.read().split('\n')
 
@@ -64,8 +55,6 @@ def process_excel_standings(filename):
         # No data for these yet.
         if (competition, season) == ('National Premier Soccer League', '2008'):
             return {}
-
-
 
         if len(fields) == 12:
             shootout_wins = fields[11]
@@ -99,11 +88,10 @@ def process_excel_standings(filename):
 
 
 def process_standings_file(p, delimiter):
-    full_path = os.path.join('/home/chris/www/soccerdata/data/standings', p)
+    #full_path = os.path.join('/home/chris/www/soccerdata/data/standings', p)
     #f = open(full_path)
-    f = codecs.open(full_path, 'r', 'utf-8')
+    f = codecs.open(p, 'r', 'utf-8')
     return process_lines(f, delimiter)
-
 
 
 def process_lines(lines, delimiter):
@@ -118,18 +106,12 @@ def process_string(s, delimiter):
     lines = s.split('\n')
     return process_lines(lines, delimiter)
 
-        
-    
-
 
 class StandingProcessor(object):
     """
     An object to feed lines of text to.
     Retains a basic memory
     """
-
-
-
 
     def __init__(self, delimiter):
         self.delimiter = delimiter
@@ -245,5 +227,3 @@ class StandingProcessor(object):
 
 
 
-if __name__ == "__main__":
-    print(process_file("/home/chris/www/soccerdata/data/standings/domestic/country/guatemala", ';'))
