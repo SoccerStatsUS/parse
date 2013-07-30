@@ -1,7 +1,28 @@
 #from nose.tools import *
 import datetime
 
-from aldo.text.games import process_string
+from aldo.parse.games import process_string
+
+ASDET = """
+Competition: MLS Cup Playoffs
+Season: 2010
+1/15/2014; Seattle Sounders; 1-0 (asdet); Real Salt Lake; Real Salt Lake; John Referee, Ramon Linesman, Dirk Assistant; 25000
+Zach Scott (unassisted) 95;
+"""
+
+def test_asdet_game():
+    games, goals, misconduct, appearances, rosters = process_string(BASIC)
+    g = games[0]
+    assert_equal(g['competition'], 'MLS Cup Playoffs')
+    assert_equal(g['season'], '2010')
+    assert_equal(g['date'], datetime.datetime(2014, 1, 15))
+    assert_equal(g['team1'], 'Seattle Sounders')
+    assert_equal(g['team2'], 'Real Salt Lake')
+    assert_equal(g['home_team'], 'Real Salt Lake')
+    assert_equal(g['team1_score'], 1)
+    assert_equal(g['team2_score'], 0)
+    assert_equal(g['minutes'], 95)
+
 
 BASIC = """
 Competition: Major League Soccer
@@ -297,8 +318,6 @@ def test_video():
     assert_equal(g1['team2_score'], 3)
     #assert_equal(g1['minutes'], 94)
     assert_equal(g1['video'], 'http://www.youtube.com/watch?v=AyRVWDgxovY')
-
-
 
 
 

@@ -1,6 +1,6 @@
-## Game result processor
+### Soccer games and standings processing
 
-A simple tool for importing and exporting soccer game result data.
+A simple tool for importing and exporting soccer standings and game results.
 
 ### Example data
 
