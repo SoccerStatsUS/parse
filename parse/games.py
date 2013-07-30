@@ -1,40 +1,53 @@
 # For processing general format score/lineup data.
 
-# These look something like
+# eg
 # 3/29/2008; FC Dallas; 3-1 (aet); Chivas Guadalajara; Laredo, TX; Alex Prus; 130000
 # Ruben Luna 3, Ruben Luna 10, Hugo Sanchez 92; Chicharito 19
 # FC Dallas: Matt Jordan, Chris Gbandi, Clarence Goodson, George John, Zach Loyd, Brek Shea, Oscar Pareja, Leonel Alvarez, Ronnie O'Brien, Jason Kreis, Carlos Ruiz
 
 import datetime
+import hashlib
 import os
 import re
+import time
 
-#from utils import get_id
+
+def get_id():
+    """
+    Create a unique hash string based on the current time.
+    """
+    return hashlib.md5(str(time.time()).encode('utf8')).hexdigest()
 
 
 def process_string(s):
-    lines = s.split('\n')
-    return process_lines(lines)
+    """
+    Process game data encoded as a string.
+    """
+    return process_lines(s.split('\n'))
+
+def process_games_file(p):
+    # Does nothing. Delete.
+    return process_file(p)
+
+def process_file(p):
+    """Process a file-like object given a path."""
+    with open(p) as f:
+        return process_lines(f)
 
 
 def process_lines(lines):
+    """
+    Process a stream of lines.
+    """
+
     gp = GeneralProcessor()
     for line in lines:
         gp.process_line(line)
 
     return (gp.games, gp.goals, gp.misconduct, gp.appearances, gp.rosters)
-        
-
-def process_games_file(p):
-
-    return process_file(p)
-
-def process_file(p):
-    f = open(p)
-    return process_lines(f)
 
 
-def process_name(s):
+def clean_name(s):
     """Clean up a player name. Remove possible leading numbers.
     e.g. '18-Tim Howard ' -> 'Tim Howard'"""
     s = s.strip()
@@ -518,65 +531,53 @@ class GeneralProcessor(object):
             minutes = 'asdet'
 
         # Replace w/o with more explicit data.
-        # (Still not sure exactly what it's supposed to mean)
-        result_unknown = not_played = False
-
+        # Still not sure what it's supposed to mean
         if score == 'w/o':
             print("skipping: %s" % score)
             return
 
+        result_unknown = not_played = False
+
         # Parse score data.
-        elif score == '?':
+        if score == '?':
             team1_score = team2_score = None
             result_unknown = True
-
-        elif score == 'v': 
-            team1_score = team2_score = None
 
         elif score in ('n/p', 'np'):
             team1_score = team2_score = None
             not_played = True
 
+        elif score == 'v': 
+            team1_score = team2_score = None
+
+
         else:
-            try:
-                team1_score, team2_score = [e.strip() for e in score.split('-')]
-            except:
-                import pdb; pdb.set_trace()
+            team1_score, team2_score = [e.strip() for e in score.split('-')]
 
             if team1_score in 'wlt':
                 team1_result = team1_score
                 team1_score = None
             else:
-                try:
-                    team1_score = int(team1_score)
-                except:
-                    import pdb; pdb.set_trace()
-
+                team1_score = int(team1_score)
 
             if team2_score in 'wlt':
                 team2_result = team2_score
                 team2_score = None
             else:
-                try:
-                    team2_score = int(team2_score)
-                except:
-                    import pdb; pdb.set_trace()
+                team2_score = int(team2_score)
 
 
         # Process ref, assistant refs, attendance, location.
         remaining = fields[4:]
 
-
         # Attendance is always the last item.
+        attendance = None
         if remaining:
             try:
                 attendance = int(remaining[-1])
                 remaining = remaining[:-1]
             except ValueError:
-                attendance = None
-        else:
-            attendance = None
-
+                pass
 
         location = ''
         referee = None
@@ -618,7 +619,7 @@ class GeneralProcessor(object):
             neutral = True
 
         g = {
-            #'gid': get_id(),
+            'gid': get_id(),
             'competition': self.competition,
             'season': self.season,
             'round': self.round,
@@ -650,7 +651,6 @@ class GeneralProcessor(object):
             'notes': '',
             'video': '',
             'minutes': minutes,
-
             }
 
         self.current_game = g
@@ -662,17 +662,13 @@ class GeneralProcessor(object):
         def process_appearance(s, team, order):
             s = filter_brackets(s)
 
+            captain = False
             capts = ['(c)', '(capt)', '(capt.)', '(Capt.)', '(Capt)', '(cap)']
             for e in capts:
-                s = s.replace(e, '')
+                if e in s:
+                    captain = True
+                    s = s.replace(e, '')
 
-            #s = s.replace('(c)', '').replace('(capt)', '').replace('(capt.)', '').replace('(capt.)', '')
-            # Off should be "end", then normalized later.
-
-            # Will implement captains later.
-            s = s.replace('(c)', '')
-
-            # Fuck. This is wrong. This is true of game plus/minus, but not appearance plus/minus.
             # Need to handle appearance minutes...
             # This is being used for determining the results of games.
             if team == self.current_game['team1']:
@@ -694,11 +690,10 @@ class GeneralProcessor(object):
                 'order': order,
                 }
 
-
-            # It should be possible to merge these into one.
-            # It might even be possible to just remove the first half of the if clause.
+            # It might be possible to remove first half of if clause
+            # Off should be "end", then normalized later.
             if '(' not in s:
-                name = process_name(s)
+                name = clean_name(s)
 
                 e = {
                     'name': name,
@@ -716,7 +711,7 @@ class GeneralProcessor(object):
                 subs = subs.replace(")", "")
                 sub_items = subs.split(",")
 
-                starter = process_name(starter)                
+                starter = clean_name(starter)                
 
                 l = [{ 'name': starter, 'on': 0 }]
                     
@@ -725,11 +720,11 @@ class GeneralProcessor(object):
                     if m:
                         sub, minute = m.groups()
                         minute = int(minute)
-                        sub = process_name(sub)
+                        sub = clean_name(sub)
                     else:
                         #print("No minute for sub %s" % s)
                         minute = None
-                        sub = process_name(sub_items[0])
+                        sub = clean_name(sub_items[0])
 
                     l[-1]['off'] = minute
                     l.append({'name': sub, 'on': minute})
@@ -748,7 +743,7 @@ class GeneralProcessor(object):
         team, players = line.split(":", 1)
         lineups = []
 
-        # Need to separate separate fields to get spearate sections.
+        # Separate ,; to represent defenders/midfielders/etc.
         for order, e in enumerate(split_outside_parens(players, ',;'), start=1):
             lineups.extend(process_appearance(e, team, order))
 
@@ -774,57 +769,61 @@ class GeneralProcessor(object):
                 minute = None
 
             if '(' in remainder:
-                goal, assists = remainder.split('(')
-                assists = [e.strip() for e in assists.replace(')', '').split(',')]
-                goal = goal.strip()
+                scorer, assisters = remainder.split('(')
+                assisters = [e.strip() for e in assisters.replace(')', '').split(',')]
+                scorer = scorer.strip()
 
             else:
-                goal = remainder.strip()
-                assists = []
+                scorer = remainder.strip()
+                assisters = []
 
-            if goal.strip() == '':
+            if scorer.strip() == '':
                 import pdb; pdb.set_trace()
 
             if 'name-title' in self.transforms:
-                goal = goal.title()
-                assists = [e.title() for e in assists]
+                scorer = scorer.title()
+                assisters = [e.title() for e in assisters]
 
             return {
                 'gid': self.current_game['gid'],
                 'competition': self.competition,
                 'date': self.current_game['date'],
                 'season': self.season,
-                'goal': goal,
-                'assists': assists,
+                'goal': scorer,
+                'assists': assisters,
                 'team': team,
                 'minute': minute,
                 }
 
 
-        goals = []
+        goals = [process_item(e, self.current_game['team1']) for e in split_outside_parens(team1_goals)]
+        goals += [process_item(e, self.current_game['team2']) for e in split_outside_parens(team2_goals)]
 
-        for e in split_outside_parens(team1_goals):
+        if self.current_game['minutes'] == 'asdet':
             try:
-                goals.append(process_item(e, self.current_game['team1']))
+                minute_goals = [e['minute'] for e in goals if e and e['minute'] is not None]
             except:
                 import pdb; pdb.set_trace()
- 
-        for e in split_outside_parens(team2_goals):
-            goals.append(process_item(e, self.current_game['team2']))
+
+            if minute_goals:
+                final_minute = max(minute_goals)
+
+
+                # presumably...no goals scored.
+                if final_minute < 90:
+                    final_minute = 120
+
+                #if final_minute < 90:
+                #    import pdb; pdb.set_trace()
+
+                if final_minute:
+                    self.current_game['minutes'] = final_minute
 
         self.goals.extend([e for e in goals if e])
 
             
 
                     
-
-        
-        
 if __name__ == "__main__":
-    d = "/home/chris/www/soccerdata/data/general"
-    for fn in os.listdir(d):
-        p = os.path.join(d, fn)
-        if os.path.isfile(p) and not fn.endswith("~"):
-            print(process_general_file(fn))
-    #print(process_general_file("harmarville.txt"))
+    print(process_file("harmarville.txt"))
     
