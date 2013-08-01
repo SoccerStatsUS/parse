@@ -105,7 +105,7 @@ def process_standings_file(p, delimiter=';'):
     """
     Process standings data received as a file-like object.
     """
-    with f as codecs.open(p, 'r', 'utf-8'):
+    with codecs.open(p, 'r', 'utf-8') as f:
         return process_lines(f, delimiter)
 
 
