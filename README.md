@@ -10,4 +10,4 @@ FC Dallas: Matt Jordan, Chris Gbandi, Clarence Goodson, George John, Zach Loyd, 
 
 ### Notes
 
-Named for [http://soccerstats.us/bios/aldo-donelli](Aldo Donelli), one of the great US soccer stars who never was.
+Named for [Aldo Donelli](http://soccerstats.us/bios/aldo-donelli), one of the great US soccer stars who never was.

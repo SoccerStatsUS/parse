@@ -6,24 +6,28 @@
 # Wikipedia Style
 # 3       Moctezuma       18      9       3       6       43      34      21
 
+
 import codecs
 import os
 
 
 def int_or_none(e):
+    """Coerce an item to an int, or return None."""
+    # Could handle some stuff, like ' ', better.
+    # Not sure whether to be more careful or more aggressive.
     if e:
-        try:
-            return int(e)
-        except:
-            import pdb; pdb.set_trace()
+        return int(e)
 
     return None
 
 
 def process_excel_standings(p):
-    # Load standings from standings file.
+    """
+    Load an old-style excel standings file.
+    """
+    # phasing this out in favor of significantly more 
+    # flexible standings files.
 
-    #p = os.path.join(DIR, "standings", filename)
     f = open(p)
     lines = f.read().split('\n')
 
@@ -87,30 +91,38 @@ def process_excel_standings(p):
     return [e for e in l if e]
 
 
-def process_standings_file(p, delimiter):
-    #full_path = os.path.join('/home/chris/www/soccerdata/data/standings', p)
-    #f = open(full_path)
-    f = codecs.open(p, 'r', 'utf-8')
-    return process_lines(f, delimiter)
-
-
-def process_lines(lines, delimiter):
-    sp = StandingProcessor(delimiter)
-    for line in lines:
-        sp.process_line(line)
-
-    return sp.standings
 
 
 def process_string(s, delimiter):
+    """
+    Process standings data received as a string.
+    For testing.
+    """
     lines = s.split('\n')
     return process_lines(lines, delimiter)
+
+def process_standings_file(p, delimiter=';'):
+    """
+    Process standings data received as a file-like object.
+    """
+    with f as codecs.open(p, 'r', 'utf-8'):
+        return process_lines(f, delimiter)
+
+
+def process_lines(lines, delimiter):
+    """
+    Parse standings lines.
+    """
+    sp = StandingProcessor(delimiter)
+    for line in lines:
+        sp.process_line(line)
+    return sp.standings
 
 
 class StandingProcessor(object):
     """
     An object to feed lines of text to.
-    Retains a basic memory
+    Retains some simple state data.
     """
 
     def __init__(self, delimiter):
@@ -127,11 +139,11 @@ class StandingProcessor(object):
 
     def process_line(self, line):
         """
-        Do a lot of processing.
+        Figure out what kind of line we're dealing with
+        and process it.
         """
         
         line = line.strip()
-
         if not line:
             return
 
@@ -141,12 +153,14 @@ class StandingProcessor(object):
         if line.startswith("*"):
             return # is a comment.
 
+
+        # Global data.
+
         if line.startswith('BlockSource:'):
             source = tag_data(line, "BlockSource:")
             if source:
                 self.sources = [source]
             return
-
 
         if line.startswith("Competition:"):
             self.competition = tag_data(line, 'Competition:')
@@ -154,15 +168,22 @@ class StandingProcessor(object):
             return
 
         if line.startswith("Key"):
+            # Consider aliasing some key data.
+            # e.g. games -> games_played, draws -> ties
             self.key = [e.strip() for e in tag_data(line, 'Key:').split(self.delimiter)]
             return
-
 
         if line.startswith("Season:"):
             self.season = tag_data(line, 'Season:')
             self.group = ''
             return
 
+        # Set the round.
+        if line.startswith("Group"):
+            self.group = tag_data(line, 'Group:')
+            return
+
+        # Should probably bring these back.
         if line.startswith("Round:"):
             #self.season = line.split("Season:")[1].strip()
             #self.group = ''
@@ -173,44 +194,27 @@ class StandingProcessor(object):
             #self.group = ''
             return
 
-        # Set the round.
-        if line.startswith("Group"):
-            self.group = tag_data(line, 'Group:')
-            return
 
-        # This is definitely a standing now.
+        # Not a known tag. 
+        # We must be dealing with an actual standing.
         if line.strip():
             self.process_standings(line)
 
 
     def process_standings(self, line):
+        """
+        Process a line of standings.
+        Just map a standings key to the parsed fields.
+        """
 
         fields = line.split(self.delimiter)
-        fields = [e.strip() for e in fields if e.strip()]
+        fields = [e.strip() for e in fields if e.strip()] # Should we really be removing empty fields like this?
 
-        if self.key is None:
-            import pdb; pdb.set_trace()
+        if self.key is None or len(self.key) != len(fields):
+            # Pause if the key won't work.
+            import pdb; pdb.set_trace() 
 
-        if len(self.key) != len(fields):
-            import pdb; pdb.set_trace()
-        
         d = dict(zip(self.key, fields))
-
-        # This is not attractive or good.
-        # A good idea to standardize standings.
-        #if len(fields) == 9:
-        #    position, team, games, wins, ties, losses, points, goals_for, goals_against = fields
-        #elif len(fields) == 8:
-        #    team, games, wins, ties, losses, goals_for, goals_against, points = fields
-        #else:
-        #    import pdb; pdb.set_trace()
-    
-
-        #try:
-        #    games = int(games)
-        #except:
-        #    import pdb; pdb.set_trace()
-
         d.update({
                 'competition': self.competition,
                 'season': self.season,
@@ -218,12 +222,8 @@ class StandingProcessor(object):
                 'final': True,
                 })
 
-
         for k in 'games', 'wins', 'ties', 'losses', 'points', 'goals_for', 'goals_against', 'shootout_wins', 'shootout_losses':
             if k in d:
                 d[k] = int_or_none(d[k])
 
         self.standings.append(d)
-
-
-
