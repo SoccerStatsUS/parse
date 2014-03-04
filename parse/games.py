@@ -185,7 +185,11 @@ class GeneralProcessor(object):
             d = line.split('Date:')[1].strip()
             if d and d.lower() != 'none':
                 try:
-                    month, day, year = [int(e) for e in d.split('/')]
+                    #month, day, year = [int(e) for e in d.split('/')]
+                    if self.date_style == 'day first':
+                        day, month, year = [int(e) for e in d.split('/')]
+                    else: 
+                        month, day, year = [int(e) for e in d.split('/')]
                     self.date = datetime.datetime(year, month, day)
                 except:
                     import pdb; pdb.set_trace()
@@ -210,6 +214,15 @@ class GeneralProcessor(object):
             self.round = self.group = self.zone = ''
             return
 
+
+
+        # What to do with zone?
+        if line.startswith("Stage:"):
+            self.stage = tag_data(line, "Stage:")
+            if self.stage.lower() == 'none':
+                self.stage = None
+            return
+
         # Set the round.
         if line.startswith("Round:"):
             self.round = tag_data(line, "Round:")
@@ -230,6 +243,15 @@ class GeneralProcessor(object):
             if self.group.lower() == 'none':
                 self.group = None
             return
+
+
+        # What to do with zone?
+        if line.startswith("Leg:"):
+            self.leg = tag_data(line, "Leg:")
+            if self.leg.lower() == 'none':
+                self.leg = None
+            return
+
 
 
         # current game tags.
@@ -273,6 +295,10 @@ class GeneralProcessor(object):
         if line.startswith("Source:"):
             self.current_game['sources'].append(tag_data(line, "Source:"))
             return
+
+        if line.startswith("Weather:"):
+            return
+
 
         # Should probably be able to unset BlockSource with a blank?
         if line.startswith('BlockSource:'):
@@ -380,9 +406,12 @@ class GeneralProcessor(object):
         except ValueError:
             print(line)
             import pdb; pdb.set_trace()
-            raise
 
-        self.process_goals(team1_goals, team2_goals)
+        try:
+            self.process_goals(team1_goals, team2_goals)
+        except:
+            import pdb; pdb.set_trace()
+            return
 
         
     def process_misconduct(self, line):
@@ -517,7 +546,11 @@ class GeneralProcessor(object):
             if year < 1800:
                 import pdb; pdb.set_trace()
                 year += self.century
-            d = datetime.datetime(year, int(month), int(day))
+
+            try:
+                d = datetime.datetime(year, int(month), int(day))
+            except:
+                import pdb; pdb.set_trace()
 
 
 
@@ -558,7 +591,10 @@ class GeneralProcessor(object):
             team1_score = team2_score = None
 
         else:
-            team1_score, team2_score = [e.strip() for e in score.split('-')]
+            try:
+                team1_score, team2_score = [e.strip() for e in score.split('-')]
+            except:
+                import pdb; pdb.set_trace()
 
             if team1_score in 'wlt':
                 team1_result = team1_score
@@ -766,7 +802,7 @@ class GeneralProcessor(object):
         Process goals for both teams.
         """
 
-        def process_item(s, team):
+        def process_item(s, team, opponent):
             s = s.strip()
             if not s:
                 return {}
@@ -803,12 +839,13 @@ class GeneralProcessor(object):
                 'goal': scorer,
                 'assists': assisters,
                 'team': team,
+                'opponent': opponent,
                 'minute': minute,
                 }
 
 
-        goals = [process_item(e, self.current_game['team1']) for e in split_outside_parens(team1_goals)]
-        goals += [process_item(e, self.current_game['team2']) for e in split_outside_parens(team2_goals)]
+        goals = [process_item(e, self.current_game['team1'], self.current_game['team2']) for e in split_outside_parens(team1_goals)]
+        goals += [process_item(e, self.current_game['team2'], self.current_game['team1']) for e in split_outside_parens(team2_goals)]
 
         if self.current_game['minutes'] == 'asdet':
             try:

@@ -179,7 +179,7 @@ class StandingProcessor(object):
             return
 
         # Set the round.
-        if line.startswith("Group"):
+        if line.startswith("Group:"):
             self.group = tag_data(line, 'Group:')
             return
 
@@ -188,6 +188,13 @@ class StandingProcessor(object):
             #self.season = line.split("Season:")[1].strip()
             #self.group = ''
             return
+
+        if line.startswith("Stage:"):
+            #self.season = line.split("Season:")[1].strip()
+            #self.group = ''
+            return
+
+
 
         if line.startswith("Region:"):
             #self.season = line.split("Season:")[1].strip()
@@ -208,7 +215,8 @@ class StandingProcessor(object):
         """
 
         fields = line.split(self.delimiter)
-        fields = [e.strip() for e in fields if e.strip()] # Should we really be removing empty fields like this?
+        #fields = [e.strip() for e in fields if e.strip()] # Should we really be removing empty fields like this?
+        fields = [e.strip() for e in fields]
 
         if self.key is None or len(self.key) != len(fields):
             # Pause if the key won't work.
