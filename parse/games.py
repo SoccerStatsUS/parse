@@ -215,6 +215,10 @@ class GeneralProcessor(object):
             return
 
 
+        if line.startswith("Time:"):
+            return
+
+
 
         # What to do with zone?
         if line.startswith("Stage:"):
