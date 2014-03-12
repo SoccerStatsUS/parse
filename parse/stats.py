@@ -54,6 +54,8 @@ class StatsProcessor(object):
 
         self.data = []
 
+        self.transforms = set()
+
 
 
     def preprocess_line(self, line):
@@ -93,6 +95,12 @@ class StatsProcessor(object):
             self.season = line.split('Season:')[1].strip()
             return
 
+        if line.startswith('Transform:'):
+            t = line.split('Transform:')[1].strip()
+            self.transforms.add(t)
+            return
+
+
         if line.startswith('BlockSource:'):
             self.source = line.split('BlockSource:')[1]
             return
@@ -117,6 +125,9 @@ class StatsProcessor(object):
 
         if self.format_name:
             d['name'] = process_name(d['name'])
+
+        if 'name-title' in self.transforms:
+            d['name'] = d['name'].title()
 
         if not d.get('team'):
             d['team'] = self.team
