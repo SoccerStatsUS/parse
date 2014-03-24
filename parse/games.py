@@ -660,9 +660,9 @@ class GeneralProcessor(object):
         if location in (team1, team2):
             home_team = location
         elif location.lower() == 'home':
-            home_team = team1
+            home_team, location = team1, None
         elif location.lower() == 'away':
-            home_team = team2
+            home_team, location = team2, None
         elif location.lower() == 'neutral':
             neutral = True
 
