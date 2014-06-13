@@ -22,7 +22,7 @@ def process_name(s):
     #import pdb; pdb.set_trace()
 
     try:
-        last, first = [e.strip() for e in s.split(',')] # Assume no 2-comma names.    
+        last, first = [e.strip() for e in s.split(',', 1)] # Assume no 2-comma names.    
 
     except:
         import pdb; pdb.set_trace()
@@ -42,7 +42,7 @@ def process_name(s):
 class StatsProcessor(object):
     
 
-    def __init__(self, delimiter='\t', format_name=False):
+    def __init__(self, delimiter=';', format_name=False):
         self.delimiter = delimiter
         self.header = None
         self.competition = None
@@ -107,8 +107,6 @@ class StatsProcessor(object):
 
         fields = line.split(self.delimiter)
 
-
-
         try:
             d = dict(zip(self.header, fields))
         except:
@@ -118,9 +116,13 @@ class StatsProcessor(object):
 
 
         if 'name' not in d:
+            import pdb; pdb.set_trace()
+            print ("missing name")
             return {}
 
         if not d['name']:
+            import pdb; pdb.set_trace()
+            print ("missing name")
             return {}
 
         if self.format_name:
@@ -177,10 +179,13 @@ class StatsProcessor(object):
 
 
 
-def process_stats(fn, root, format_name=False, source=None, delimiter="\t"):
+def process_stats(fn, root, format_name=False, source=None, delimiter=";"):
+    print(fn)
     sp = StatsProcessor(delimiter, format_name=format_name)
     path = os.path.join(root, fn)
     lines = open(path).read().strip().split('\n')    
+
+
 
     for line in lines:
         sp.process_line(line)

@@ -121,7 +121,7 @@ class GeneralProcessor(object):
 
     DATE_RE = re.compile("(\d+)/([\d\?]+)/(\d+)")
     DATE_TIME_RE = re.compile("(\d+)/(\d+)/(\d+) (\d+)z")
-    FLAGS = ["Minigame", "Forfeit", "Annulled", "Replay", "Indoor"]
+    FLAGS = ["Minigame", "Forfeit", "Annulled", "Replay", "Indoor", "Awarded", 'closed doors']
 
     def __init__(self):
         self.competition = None
@@ -286,6 +286,10 @@ class GeneralProcessor(object):
                 try:
                     t1_kickers, t2_kickers = [e.split(',') for e in data.split(';')]
                 except ValueError:
+                    if data in ("W-L", "L-W"):
+                        print("not processing pk W/L")
+                        return
+
                     import pdb; pdb.set_trace()
 
             return
@@ -587,7 +591,7 @@ class GeneralProcessor(object):
             team1_score = team2_score = None
             result_unknown = True
 
-        elif score in ('n/p', 'np'):
+        elif score in ('n/p', 'np', 'abd'):
             team1_score = team2_score = None
             not_played = True
 
@@ -604,7 +608,10 @@ class GeneralProcessor(object):
                 team1_result = team1_score
                 team1_score = None
             else:
-                team1_score = int(team1_score)
+                try:
+                    team1_score = int(team1_score)
+                except:
+                    import pdb; pdb.set_trace()
 
             if team2_score in 'wlt':
                 team2_result = team2_score
