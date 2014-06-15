@@ -133,7 +133,9 @@ class GeneralProcessor(object):
         self.current_game = None
         #self.century = None # Manage dates like 3/23/10
 
+        # combine these
         self.home_first = False
+        self.away_first = False
 
         self.date = None
         self.date_style = 'month first'
@@ -174,6 +176,12 @@ class GeneralProcessor(object):
         if line.strip() == 'home-first':
             # In this file, home teams are listed first.
             self.home_first = True
+            return
+
+
+        if line.strip() == 'away-first':
+            # In this file, home teams are listed first.
+            self.away_first = True
             return
 
         if line.startswith('Transform:'):
@@ -574,6 +582,14 @@ class GeneralProcessor(object):
             score = score.replace('(aet)', '')
             minutes = 120
 
+        if '(ot)' in score:
+            score = score.replace('(ot)', '')
+            minutes = 'asdet'
+
+        if '(so)' in score:
+            score = score.replace('(so)', '')
+
+
         if '(asdet)' in score:
             score = score.replace('(asdet)', '')
             minutes = 'asdet'
@@ -663,6 +679,9 @@ class GeneralProcessor(object):
 
         if self.home_first and not location:
             home_team = team1
+
+        elif self.away_first and not location:
+            home_team = team2
 
         if location in (team1, team2):
             home_team = location
