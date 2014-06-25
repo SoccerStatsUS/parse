@@ -126,8 +126,12 @@ class GeneralProcessor(object):
     def __init__(self):
         self.competition = None
         self.season = None
-        self.round = ''
+
+        self.stage = ''
         self.group = ''
+        self.round = ''
+        self.leg = ''
+
         self.sources = []
 
         self.current_game = None
@@ -231,8 +235,17 @@ class GeneralProcessor(object):
         # What to do with zone?
         if line.startswith("Stage:"):
             self.stage = tag_data(line, "Stage:")
+            self.group = self.round = self.leg = ''
             if self.stage.lower() == 'none':
                 self.stage = None
+            return
+
+
+        if line.startswith("Group:"):
+            self.group = tag_data(line, "Group:")
+            if self.group.lower() == 'none':
+                self.group = None
+            self.round = self.leg = ''
             return
 
         # Set the round.
@@ -240,28 +253,21 @@ class GeneralProcessor(object):
             self.round = tag_data(line, "Round:")
             if self.round.lower() == 'none':
                 self.round = ''
-                self.group = ''
+            self.leg = ''
             return
 
-        if line.startswith("Group:"):
-            self.group = tag_data(line, "Group:")
-            if self.group.lower() == 'none':
-                self.group = None
-            return
-
-        # What to do with zone?
-        if line.startswith("Zone:"):
-            self.group = tag_data(line, "Zone:")
-            if self.group.lower() == 'none':
-                self.group = None
-            return
-
-
-        # What to do with zone?
         if line.startswith("Leg:"):
             self.leg = tag_data(line, "Leg:")
             if self.leg.lower() == 'none':
                 self.leg = None
+            return
+
+
+        # Get rid of zone; split it between group and stage
+        if line.startswith("Zone:"):
+            self.group = tag_data(line, "Zone:")
+            if self.group.lower() == 'none':
+                self.group = None
             return
 
 
@@ -698,6 +704,7 @@ class GeneralProcessor(object):
             'season': self.season,
             'round': self.round,
             'group': self.group,
+            'stage': self.stage,
 
             'date': d,
 

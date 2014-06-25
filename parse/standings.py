@@ -130,6 +130,7 @@ class StandingProcessor(object):
         self.competition = None
         self.season = None
         self.group = ''
+        self.stage = ''
         self.key = None
 
         self.sources = []
@@ -164,7 +165,7 @@ class StandingProcessor(object):
 
         if line.startswith("Competition:"):
             self.competition = tag_data(line, 'Competition:')
-            self.group = ''
+            self.group = self.stage = ''
             return
 
         if line.startswith("Key"):
@@ -175,30 +176,23 @@ class StandingProcessor(object):
 
         if line.startswith("Season:"):
             self.season = tag_data(line, 'Season:')
+            self.group = self.stage = ''
+            return
+
+        if line.startswith("Stage:"):
+            self.stage = tag_data(line, 'Stage:')
             self.group = ''
             return
 
-        # Set the round.
         if line.startswith("Group:"):
             self.group = tag_data(line, 'Group:')
             return
 
-        # Should probably bring these back.
+        # Unused in standings?
         if line.startswith("Round:"):
-            #self.season = line.split("Season:")[1].strip()
-            #self.group = ''
             return
-
-        if line.startswith("Stage:"):
-            #self.season = line.split("Season:")[1].strip()
-            #self.group = ''
-            return
-
-
 
         if line.startswith("Region:"):
-            #self.season = line.split("Season:")[1].strip()
-            #self.group = ''
             return
 
 
@@ -227,6 +221,7 @@ class StandingProcessor(object):
                 'competition': self.competition,
                 'season': self.season,
                 'group': self.group,
+                'stage': self.stage,
                 'final': True,
                 })
 
