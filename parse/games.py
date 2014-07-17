@@ -844,7 +844,10 @@ class GeneralProcessor(object):
             if not s:
                 return {}
 
-            m = re.match('(.*?)(\d+)', s)
+            # worried this may be dropping things from goal entries.
+            # eg Wolfgang Rausch (pk) 21:20 -> ('Wolfgang Rausch (pk) ', '21')
+            # worked well in this case, but...
+            m = re.match('(.*?)(\d+)', s) 
             if m:
                 remainder, minute = m.groups()
                 minute = int(minute)
