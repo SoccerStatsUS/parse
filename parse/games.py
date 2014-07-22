@@ -216,6 +216,9 @@ class GeneralProcessor(object):
             self.date_style = tag_data(line, "Date-style:")
             return
 
+        if line.startswith("Timezone:"):
+            return
+
         if line.startswith("Competition:"):
             self.competition = tag_data(line, "Competition:")
             self.round = self.group = self.zone = ''

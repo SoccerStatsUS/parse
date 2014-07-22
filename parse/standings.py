@@ -137,6 +137,8 @@ class StandingProcessor(object):
 
         self.standings = []
 
+        self.current_standing = None
+
 
     def process_line(self, line):
         """
@@ -153,6 +155,11 @@ class StandingProcessor(object):
         
         if line.startswith("*"):
             return # is a comment.
+
+        if line.startswith("Notes:"):
+            self.current_standing['notes'] = tag_data(line, "Notes:")
+            return
+
 
 
         # Global data.
@@ -217,6 +224,7 @@ class StandingProcessor(object):
             import pdb; pdb.set_trace() 
 
         d = dict(zip(self.key, fields))
+
         d.update({
                 'competition': self.competition,
                 'season': self.season,
@@ -229,4 +237,5 @@ class StandingProcessor(object):
             if k in d:
                 d[k] = int_or_none(d[k])
 
+        self.current_standing = d
         self.standings.append(d)
