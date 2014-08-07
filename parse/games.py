@@ -443,6 +443,7 @@ class GeneralProcessor(object):
         """
         Process a misconduct line.
         """
+        return []
         return process_misconduct(line)
 
         
@@ -883,7 +884,7 @@ class GeneralProcessor(object):
 
 
 
-def process_goal(s, team, opponent, name_title=False):
+def process_goal(s, name_title=False):
     s = s.strip()
     if not s:
         return {}
@@ -929,8 +930,8 @@ def process_goal(s, team, opponent, name_title=False):
         #'season': self.season,
         'goal': scorer,
         'assists': assisters,
-        'team': team,
-        'opponent': opponent,
+        #'team': team,
+        #'opponent': opponent,
         'minute': minute,
         #'own_goal': False,
         }
@@ -967,10 +968,11 @@ def process_appearance(s):
             'on': 0,
             'off': 90,
             }
-        e.update(base)
+        #e.update(base)
         return [e]
 
     else:
+
         try:
             starter, subs = s.split("(")
         except:
@@ -993,17 +995,15 @@ def process_appearance(s):
                 minute = None
                 sub = clean_name(sub_items[0])
 
-        l[-1]['off'] = minute
-        l.append({'name': sub, 'on': minute})
+            l[-1]['off'] = minute
+            l.append({'name': sub, 'on': minute})
 
-        l[-1]['off'] = 90
-        for e in l:
-            e.update(base)
+        l[-1]['off'] = 90 # This should be 'end' or something similar.
 
         return l
 
 
-def process_misconduct(line):
+def process_misconduct_x(line):
         def process_item(team, s):
             m = re.match('(.*?)(\d+)', s)
             if m:
