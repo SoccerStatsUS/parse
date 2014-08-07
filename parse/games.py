@@ -1003,7 +1003,7 @@ def process_appearance(s):
         return l
 
 
-def process_misconduct(line)
+def process_misconduct(line):
         def process_item(team, s):
             m = re.match('(.*?)(\d+)', s)
             if m:
