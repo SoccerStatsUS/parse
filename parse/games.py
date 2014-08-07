@@ -443,39 +443,8 @@ class GeneralProcessor(object):
         """
         Process a misconduct line.
         """
+        return process_misconduct(line)
 
-        def process_item(team, s):
-            m = re.match('(.*?)(\d+)', s)
-            if m:
-                name = m.groups()[0].strip()
-                minute = int(m.groups()[1])
-            else:
-                name, minute = s.strip(), None
-
-            return {
-                'gid': self.current_game['gid'],
-                'competition': self.competition,
-                'date': self.current_game['date'],
-                'season': self.season,
-                'name': name,
-                'minute': minute,
-                'type': 'red',
-                'team': team,
-                }
-            
-
-        process_side = lambda t, l: [process_item(t, e) for e in l.split(',') if e.strip()]
-
-        if ';' in line:
-            t1m, t2m = line.split(';')
-            t1, t2 = self.current_game['team1'], self.current_game['team2']
-            l = process_side(t1, t1m)
-            l.extend(process_side(t2, t2m))
-
-        else:
-            l = process_side(None, line)
-
-        return l
         
 
     def process_roster(self, line):
@@ -912,7 +881,160 @@ class GeneralProcessor(object):
 
         self.goals.extend([e for e in goals if e])
 
+
+
+def process_goal(s, team, opponent, name_title=False):
+    s = s.strip()
+    if not s:
+        return {}
+
+    # worried this may be dropping things from goal entries.
+    # eg Wolfgang Rausch (pk) 21:20 -> ('Wolfgang Rausch (pk) ', '21')
+    # worked well in this case, but...
+
+    m = re.match('(.*?)(\d+)', s) 
+
+    if m:
+        remainder, minute = m.groups()
+        minute = int(minute)
+
+    # There is no minute for this goal
+    else:
+        remainder = s
+        minute = None
+
+    if '(' in remainder:
+        scorer, assisters = remainder.split('(')
+        assisters = [e.strip() for e in assisters.replace(')', '').split(',')]
+        scorer = scorer.strip()
+
+    else:
+        scorer = remainder.strip()
+        assisters = []
+
+    if scorer.strip() == '':
+        import pdb; pdb.set_trace()
+
+    #if 'name-title' in self.transforms:
+    if name_title:
+        scorer = scorer.title()
+        assisters = [e.title() for e in assisters]
+
+        
+
+    return {
+        #'gid': self.current_game['gid'],
+        #'competition': self.competition,
+        #'date': self.current_game['date'],
+        #'season': self.season,
+        'goal': scorer,
+        'assists': assisters,
+        'team': team,
+        'opponent': opponent,
+        'minute': minute,
+        #'own_goal': False,
+        }
+
+
+
+def process_appearance(s):
+    """
+    Constructs a very simple list of appearances
+    eg
+    l = [{'name': 'Pele', 'on': 0, 'off': 70 },]
+    """
+    # A simpler substitution item that can be plugged into 
+    # various places.
+    
+    s = filter_brackets(s)
+
+    captain = False
+    """
+    capts = ['(c)', '(capt)', '(capt.)', '(Capt.)', '(Capt)', '(cap)']
+    for e in capts:
+        if e in s:
+            captain = True
+            s = s.replace(e, '')
+    """
+
+    # It might be possible to remove first half of if clause
+    # Off should be "end", then normalized later.
+    if '(' not in s:
+        name = clean_name(s)
+
+        e = {
+            'name': name,
+            'on': 0,
+            'off': 90,
+            }
+        e.update(base)
+        return [e]
+
+    else:
+        try:
+            starter, subs = s.split("(")
+        except:
+            import pdb; pdb.set_trace()
+        subs = subs.replace(")", "")
+        sub_items = subs.split(",")
+
+        starter = clean_name(starter)                
+
+        l = [{ 'name': starter, 'on': 0 }]
+                    
+        for item in sub_items:
+            m = re.match("(.*)( \d+)", item)
+            if m:
+                sub, minute = m.groups()
+                minute = int(minute)
+                sub = clean_name(sub)
+            else:
+                #print("No minute for sub %s" % s)
+                minute = None
+                sub = clean_name(sub_items[0])
+
+        l[-1]['off'] = minute
+        l.append({'name': sub, 'on': minute})
+
+        l[-1]['off'] = 90
+        for e in l:
+            e.update(base)
+
+        return l
+
+
+def process_misconduct(line)
+        def process_item(team, s):
+            m = re.match('(.*?)(\d+)', s)
+            if m:
+                name = m.groups()[0].strip()
+                minute = int(m.groups()[1])
+            else:
+                name, minute = s.strip(), None
+
+            return {
+                #'gid': self.current_game['gid'],
+                #'competition': self.competition,
+                #'date': self.current_game['date'],
+                #'season': self.season,
+                'team': team,
+                'name': name,
+                'minute': minute,
+                'type': 'red',
+                }
             
+        process_side = lambda t, l: [process_item(t, e) for e in l.split(',') if e.strip()]
+
+        if ';' in line:
+            t1m, t2m = line.split(';')
+            t1, t2 = self.current_game['team1'], self.current_game['team2']
+            l = process_side(t1, t1m)
+            l.extend(process_side(t2, t2m))
+
+        else:
+            l = process_side(None, line)
+
+        return l
 
                     
 if __name__ == "__main__":
