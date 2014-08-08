@@ -743,12 +743,6 @@ class GeneralProcessor(object):
 
             l = process_appearance(s)
 
-            #captain = False
-            #capts = ['(c)', '(capt)', '(capt.)', '(Capt.)', '(Capt)', '(cap)']
-            #for e in capts:
-            #    if e in s:
-            #        captain = True
-            #        s = s.replace(e, '')
 
             # Need to handle appearance minutes...
             # This is being used for determining the results of games.
@@ -897,6 +891,14 @@ def process_appearance(s):
     # various places.
     
     s = filter_brackets(s)
+
+    captain = False
+    capts = ['(c)', '(capt)', '(capt.)', '(Capt.)', '(Capt)', '(cap)']
+    for e in capts:
+        if e in s:
+            captain = True
+            s = s.replace(e, '')
+
 
     # It might be possible to remove first half of if clause
     # Off should be "end", then normalized later.
