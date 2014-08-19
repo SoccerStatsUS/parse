@@ -250,7 +250,7 @@ class RosterProcessor3(object):
 
     def process_line(self, line):
 
-        if not line or line.startswith('*'):
+        if not line.strip() or line.startswith('*'):
             return
 
         if line.startswith('Key:'):
