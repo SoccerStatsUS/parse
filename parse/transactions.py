@@ -12,6 +12,9 @@
 
 # should use keys.
 
+import datetime
+import os
+
 
 
 # This should probably be in utils.
@@ -35,113 +38,97 @@ def remove_pairs(text, start, end):
 
 
 
-class TransactionProcessor(object):
-    """
-    An object to feed lines of text to.
-    Retains some simple state data.
-    """
 
-    def __init__(self, delimiter):
+
+class TransactionProcessor(object):
+    
+
+    def __init__(self, delimiter=';'):
         self.delimiter = delimiter
+        self.header = None
         self.competition = None
         self.season = None
-        self.round = None
+        self.source = None
 
-        self.number = 0
-        self.key = None
-
-        self.sources = []
-        self.drafts = []
-        self.picks = []
+        self.data = []
+        self.previous_item = None
 
 
     def process_line(self, line):
 
-        line = remove_pairs(line, "[", "]")
-
-        if line.startswith('*'):
-            return
-
-        if line.startswith("Round:"):
-            self.round = 
+        if not line or line.startswith('*'):
             return
 
         tag_data = lambda l, t: l.split(t, 1)[1].strip()
 
-        # draft subclass?
-        if line.startswith("Draft:"):
-            self.name = tag_data("Draft")
+        line = line.strip()
 
-        elif line.startswith("Competition"):
-            self.competition = line.replace("Competition:", '').strip()
-            if self.competition == "None":
-                self.competition = None
+        if line.startswith('Key:'):
+            h = line.split('Key:')[1]
+            self.header = [e.strip() for e in h.split(self.delimiter)]
+            return
+
+        if line.startswith('Competition:'):
+            self.competition = line.split('Competition:')[1].strip()
+            return
+
+        if line.startswith('Season:'):
+            self.season = line.split('Season:')[1].strip()
+            return
+
+        if line.startswith('BlockSource:'):
+            self.source = line.split('BlockSource:')[1]
+            return
+
+        if line.startswith("Source:"):
+            self.current_transaction['sources'].append(tag_data(line, "Source:"))
+            return
 
 
-        elif line.startswith("Season"):
-            self.season = line.replace("Season:", '').strip()
-            self.pick_number = 1
-            self.drafts.append({
-                    'name': self.name,
-                    'season': self.season,
-                    'competition': self.competition,
-                    })
+        fields = line.split(self.delimiter)
 
-        elif line.startswith("Date:"):
-            s = line.replace("Date:", '')
-            fields = s.split(',')
+        try:
+            d = dict(zip(self.header, fields))
+        except:
+            import pdb; pdb.set_trace()
 
-            fields = [e.strip() for e in fields]
+        if self.source:
+            sources = [self.source]
+        else:
+            sources = []
 
-            if len(fields) == 2:
-                start, end = [process_date(e) for e in fields]
-                
-            elif len(fields) == 1:
-                start = process_date(fields[0])
-                end = start
-
-            self.current_draft['start'] = start
-            self.current_draft['end'] = end
-
-        elif line.strip():
-            fields = [e.strip() for e in line.split(';')]
-
-            # Remove leading #'s if possible (we do them ourselves)
-            # e.g. 12; MetroStars; Eddie Gaven; M -> MetroStars; Eddie Gaven; M
-
+        if 'date' in d and d['date'].strip():
             try:
-                int(fields[0])
-                fields = fields[1:]
+                month, day, year = d['date'].split('/')
             except:
-                pass
-
-            if len(fields) == 2:
-                team, text = fields
-                position = former_team = None
-
-            elif len(fields) == 3:
-                team, text, position = fields
-                former_team = None
-
-            elif len(fields) == 4:
-                team, text, position, former_team = fields
-
-            else:
                 import pdb; pdb.set_trace()
-                
-            if position and len(position) > 5:
-                import pdb; pdb.set_trace()
+            dt = datetime.datetime(int(year), int(month), int(day))
+        else:
+            dt = None
 
-            self.picks.append({
-                    'team': team,
-                    'text': text,
-                    'position': position,
-                    'former_team': former_team,
-                    'number': self.pick_number,
-                    'draft': self.current_draft['name'],
-                    'season': self.current_draft['season'],
-                    'competition': self.competition,
-                    })
 
-            self.pick_number += 1
+        d2 = {
+            'date': dt,
+            'ttype': d['type'],
+            'person': d['person'],
+            'team_to': d.get('team_to'),
+            'team_from': d.get('team_from'),
+            'sources': sources,
+            }
+
+        self.current_transaction = d2
+        self.data.append(d2)
+
+
+
+def process_transactions(fn, root, delimiter=";"):
+    sp = TransactionProcessor(delimiter)
+
+    path = os.path.join(root, fn)
+    lines = open(path).read().strip().split('\n')    
+
+    for line in lines:
+        sp.process_line(line)
+
+    return [e for e in sp.data if e]
 
