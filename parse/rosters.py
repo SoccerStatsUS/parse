@@ -5,7 +5,7 @@
 import os
 import re
 
-from soccerdata.settings import ROOT_DIR
+from metadata.settings import ROOT_DIR
 
 
 def filter_brackets(s):
@@ -78,7 +78,7 @@ def fix_roster_name(name):
         
 
 
-def process_rosters(fn, root='soccerdata/data/rosters'):
+def process_rosters(fn, root='metadata/data/rosters'):
 
     l = []
 
@@ -168,7 +168,7 @@ def process_rosters2(fn=None, path=None):
         raise
 
     if path is None:
-        path = os.path.join(ROOT_DIR, 'soccerdata/data/rosters/', fn)
+        path = os.path.join(ROOT_DIR, 'metadata/data/rosters/', fn)
 
     f = open(path)
 
