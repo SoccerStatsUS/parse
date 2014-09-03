@@ -131,6 +131,9 @@ class StandingProcessor(object):
         self.season = None
         self.group = ''
         self.stage = ''
+
+        self.team = None # For Team: style standings. allow?
+
         self.key = None
 
         self.sources = []
@@ -186,6 +189,10 @@ class StandingProcessor(object):
             self.group = self.stage = ''
             return
 
+        if line.startswith('Team:'):
+            self.team = tag_data(line, 'Team:')
+            return
+
         if line.startswith("Stage:"):
             self.stage = tag_data(line, 'Stage:')
             self.group = ''
@@ -225,9 +232,14 @@ class StandingProcessor(object):
 
         d = dict(zip(self.key, fields))
 
+        if 'season' in d:
+            season = d['season']
+        else:
+            season = self.season
+
         d.update({
                 'competition': self.competition,
-                'season': self.season,
+                'season': season,
                 'group': self.group,
                 'stage': self.stage,
                 'final': True,
@@ -236,6 +248,9 @@ class StandingProcessor(object):
         for k in 'games', 'wins', 'ties', 'losses', 'points', 'goals_for', 'goals_against', 'shootout_wins', 'shootout_losses':
             if k in d:
                 d[k] = int_or_none(d[k])
+
+        if d.get('team') is None:
+            d['team'] = self.team
 
         self.current_standing = d
         self.standings.append(d)
