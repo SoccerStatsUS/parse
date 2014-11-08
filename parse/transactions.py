@@ -84,6 +84,10 @@ class TransactionProcessor(object):
             self.current_transaction['sources'].append(tag_data(line, "Source:"))
             return
 
+        if line.startswith("Notes:"):
+            self.current_transaction['notes'] = tag_data(line, "Notes:")
+            return
+
 
         fields = line.split(self.delimiter)
 
@@ -107,18 +111,38 @@ class TransactionProcessor(object):
             dt = None
 
 
-        d2 = {
-            'date': dt,
-            'ttype': d['type'],
-            'person': d['person'],
-            'team_to': d.get('team_to'),
-            'team_from': d.get('team_from'),
-            'sources': sources,
+
+
+        if d['type'].strip() != 'trade':
+            d2 = {
+                'date': dt,
+                'ttype': d['type'],
+                'person': d['person'],
+                'team_to': d.get('team_to'),
+                'team_from': d.get('team_from'),
+                'sources': sources,
             }
 
-        self.current_transaction = d2
-        self.data.append(d2)
+            self.current_transaction = d2
+            self.data.append(d2)
 
+        else:
+            items = d['person'].split(',')
+
+            try:
+                teams = d['team_to'].split(',')
+            except:
+                import pdb; pdb.set_trace()
+
+            if len(items) != len(teams):
+                import pdb; pdb.set_trace()
+
+            units = zip(items, teams)
+            
+            l = [{'date': dt, 'ttype': 'trade', 'person': p, 'team_to': t, 'sources': sources} for (p,t) in units]
+
+            self.current_transaction = l[-1]
+            self.data.extend(l)
 
 
 def process_transactions(fn, root, delimiter=";"):
