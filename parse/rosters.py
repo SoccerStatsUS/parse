@@ -152,6 +152,9 @@ class RosterProcessor(object):
 
             player = fix_roster_name(player)
 
+            if not name:
+                import pdb; pdb.set_trace()
+
             self.rosters.append({
                     'competition': self.competition,
                     'season': self.season,

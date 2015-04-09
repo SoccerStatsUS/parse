@@ -19,8 +19,6 @@ def process_name(s):
     if s in mapping:
             s = mapping[s]
 
-    #import pdb; pdb.set_trace()
-
     try:
         last, first = [e.strip() for e in s.split(',', 1)] # Assume no 2-comma names.    
 

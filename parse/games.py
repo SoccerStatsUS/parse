@@ -564,18 +564,13 @@ class GeneralProcessor(object):
             if year < 1800:
                 import pdb; pdb.set_trace()
                 year += self.century
-
-            try:
+                
+            try
                 d = datetime.datetime(year, int(month), int(day))
             except:
                 import pdb; pdb.set_trace()
 
-
-
-        try:
-            team1, score, team2 = fields[1:4]
-        except:
-            import pdb; pdb.set_trace()
+        team1, score, team2 = fields[1:4]
 
         score = score.lower().strip()
         minutes = 90
@@ -667,10 +662,6 @@ class GeneralProcessor(object):
             referee = people[0].strip()
             linesmen = [e.strip() for e in people[1:]]
 
-        if self.competition is None or self.season is None:
-            import pdb; pdb.set_trace()
-
-        
         # Home team management.
         # Should do this in normalization...
         team1 = team1.strip()
@@ -706,24 +697,26 @@ class GeneralProcessor(object):
 
             'team1': team1,
             'team2': team2,
+            'home_team': home_team,
+            'neutral': neutral,
+
+            'result_unknown': result_unknown,
+            'not_played': not_played,
+            'forfeit': False,
+
             'team1_score': team1_score,
             'team2_score': team2_score,
             'team1_result': team1_result,
             'team2_result': team2_result,
-            'result_unknown': result_unknown,
-            'not_played': not_played,
-
-            'home_team': home_team,
             'shootout_winner': None,
 
             'location': location,
-            'neutral': neutral,
 
             'referee': referee,
             'linesmen': linesmen,
             'attendance': attendance,
             'minigame': False,
-            'forfeit': False,
+
             'sources': self.sources[:],
             'notes': '',
             'video': '',
