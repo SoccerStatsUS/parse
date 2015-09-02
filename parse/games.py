@@ -571,7 +571,7 @@ class GeneralProcessor(object):
                 import pdb; pdb.set_trace()
                 year += self.century
                 
-            try
+            try:
                 d = datetime.datetime(year, int(month), int(day))
             except:
                 import pdb; pdb.set_trace()
