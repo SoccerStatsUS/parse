@@ -46,10 +46,10 @@
 
 
 (defun dates-split
-  () 
-  (interactive)
+  (year) 
+  (interactive "nYear:")
   (setq lines 370)
-  (setq year 2015)
+  ;(setq year 2014)
   (setq year1 (+ 1 year))
 
   (condition-case nil
@@ -102,10 +102,10 @@
 
 
 (defun dates-full
-  () 
-  (interactive)
+  (year) 
+  (interactive "nYear:")
   (setq lines 500)
-  (setq year 2015)
+  ;(setq year 2015)
 
   (condition-case nil
       (apply-macro-to-region-lines 1 lines (concat "\C-s[Jan \C-b\C-d\C-?\C-?\C-?\C-?\C-mDate: 1/\C-s]\C-b/" (number-to-string year) "\C-d\C-m"))
