@@ -5,89 +5,43 @@
 (setq-default tab-width 4)
 
 ;(add-to-list 'load-path "~/.emacs.d/test.el")
-
-; Ruby mode
-
-;(require 'ruby-mode)
-;(autoload 'ruby-mode "ruby-mode" "Major mode for editing ruby scripts." t)
-;(setq auto-mode-alist  (cons '(".rb$" . ruby-mode) auto-mode-alist))
-
-
-;; Scala mode
-;(defun scala-turn-off-indent-tabs-mode ()
-;  (setq indent-tabs-mode nil))
-;(add-hook 'scala-mode-hook 'scala-turn-off-indent-tabs-mode)
-
-;(add-to-list 'auto-mode-alist '("\\.scala\\'" . scala-mode))
-;(autoload 'scala-mode "~/.emacs.d/scala/scala-mode-auto.el" nil t)
-
-; haml mode
 ;(add-to-list 'auto-mode-alist '("\\.haml\\'" . haml-mode))
 ;(autoload 'haml-mode "~/.emacs.d/haml-mode.el" nil t)
-
-
-;; Javascript mode
-;(add-to-list 'auto-mode-alist '("\\.js\\'" . javascript-mode))
-;(autoload 'javascript-mode "~/.emacs.d/javascript.el" nil t)
-
-;; Coffeescript mode
-;(add-to-list 'load-path "~/.emacs.d/vendor/coffee-mode")
-;(require 'coffee-mode)
-
-;(defun coffee-custom ()
-;  "coffee-mode-hook"
-;  (set (make-local-variable 'tab-width) 2))
-
-;(add-hook 'coffee-mode-hook '(lambda() (coffee-custom)))
 
 
 ; SoccerStats.us keybindings
 ; these are for formatting soccer data text, primarily taken from rsssf
 
+; ‘M-x apply-macro-to-region-lines’
+; ‘M-x name-last-kbd-macro’ – Name the last-defined keyboard macro.
+; ‘M-x insert-kbd-macro’ – Insert a named keyboard macro at point.
 
 
-(fset 'remove-duplicate-space
-   "\C-s  \C-b\C-?\C-a")
-
+(fset 'remove-duplicate-space "\C-s  \C-b\C-?\C-a")
 (fset 'comment-out "*\C-e\C-f")
+
+(fset 'format-round "\C-[xreplace-string\C-mRound\C-mRound:\C-m")
 
 (fset 'format-rsssf-game "\C-s-\C-a; \C-s-\C-b\C-r \C-b\C-f;\C-s \C-s\C-b;\C-a\C-n")
 (fset 'format-rsssf-colon-game "\C-s:\C-a; \C-s:\C-b-\C-d\C-r \C-b\C-f;\C-s \C-s\C-b;\C-a\C-n")
 
 (fset 'format-rsssf-game-goals "\C-cg\C-a\C-b\C-b\C-b\C-s[\C-b\C-d\C-s]\C-b\C-d\C-m")
 
-(fset 'format-round
-  "\C-[xreplace-string\C-mRound\C-mRound:\C-m")
-
-
 (fset 'format-mexico-goals
    "\C-[\C-s [0-9] \C-b\C-b\C-b;\C-f\C-f-\C-[\C-s [0-9]\C-b\C-k\C-r-\C-f\C-y;\C-a; \C-s[\C-b\C-d\C-s]\C-b\C-d\C-m\C-m")
 
-(fset 'format-double-semicolon
-   "\C-s;;\C-b\C-d\C-s-\C-s\C-f\C-b\C-s \C-b;\C-a\C-n")
 
+(fset 'format-double-semicolon "\C-s;;\C-b\C-d\C-s-\C-s\C-f\C-b\C-s \C-b;\C-a\C-n")
 
+(fset 'format-attendance "\C-[\C-s[0-9],[0-9][0-9][0-9]\C-b\C-b\C-b\C-?\C-b\C-b\C-b;")
 
-; ‘M-x apply-macro-to-region-lines’
-; ‘M-x name-last-kbd-macro’ – Name the last-defined keyboard macro.
-; ‘M-x insert-kbd-macro’ – Insert a named keyboard macro at point.
+(fset 'format-penalty "\C-[\C-s[0-9]pen\C-b\C-d\C-?\C-?\C-r \C-f(pk) ")
 
-(fset 'format-attendance
-   "\C-[\C-s[0-9],[0-9][0-9][0-9]\C-b\C-b\C-b\C-?\C-b\C-b\C-b;")
+(fset 'format-penaltyb "\C-s pen\C-b\C-d\C-?\C-?\C-?\C-r \C-f(pk) ")
 
+(fset 'format-own-goal "\C-[\C-s[0-9]og\C-b\C-d\C-?\C-r \C-f(og) ")
 
-
-(fset 'format-penalty
-   "\C-[\C-s[0-9]pen\C-b\C-d\C-?\C-?\C-r \C-f(pk) ")
-
-(fset 'format-penaltyb
-   "\C-s pen\C-b\C-d\C-?\C-?\C-?\C-r \C-f(pk) ")
-
-(fset 'format-own-goal
-   "\C-[\C-s[0-9]og\C-b\C-d\C-?\C-r \C-f(og) ")
-
-(fset 'format-duplicate-scorer
-   "\C-[\C-s [0-9]\C-b\C-w\C-y\C-s,\C-f\C-y")
+(fset 'format-duplicate-scorer "\C-[\C-s [0-9]\C-b\C-w\C-y\C-s,\C-f\C-y")
 
 
 
