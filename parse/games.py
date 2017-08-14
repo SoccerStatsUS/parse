@@ -363,7 +363,13 @@ class GeneralProcessor(object):
         if line.startswith("Yellow Cards:"):
             s = tag_data(line, "Yellow Cards:")
             self.misconduct.extend(self.process_misconduct(s))
+            return
+
+        if line.startswith("Yellow Card:"):
+            s = tag_data(line, "Yellow Card:")
+            self.misconduct.extend(self.process_misconduct(s))
             return 
+        
 
 
         if line.startswith("Shootout Win"):
@@ -464,8 +470,13 @@ class GeneralProcessor(object):
         process_side = lambda t, l: [process_item(t, e) for e in l.split(',') if e.strip()]
 
         if ';' in line:
-            t1m, t2m = line.split(';')
+            try:
+                t1m, t2m = line.split(';')
+            except:
+                import pdb; pdb.set_trace()
+
             t1, t2 = self.current_game['team1'], self.current_game['team2']
+                
             l = process_side(t1, t1m)
             l.extend(process_side(t2, t2m))
         else:
@@ -576,7 +587,10 @@ class GeneralProcessor(object):
             except:
                 import pdb; pdb.set_trace()
 
-        team1, score, team2 = fields[1:4]
+        try:
+            team1, score, team2 = fields[1:4]
+        except:
+            import pdb; pdb.set_trace()
 
         score = score.lower().strip()
         minutes = 90
