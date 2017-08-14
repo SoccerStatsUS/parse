@@ -226,13 +226,6 @@ class RosterProcessor2(object):
                         })
 
 
-
-
-
-
-
-
-
 class RosterProcessor3(object):
     
 
@@ -352,7 +345,45 @@ class RosterProcessor3(object):
 
                 d[k] = v
 
-        d['position'] = d['points'] = ''
+        #d['position'] = d['points'] = ''
+
+        import datetime
+
+        height = d.get('height')
+        if type(height) == str:
+
+            if '-' in height:
+                #feet, inches = [int(e) for e in height.split('-')]
+                feet, inches = [float(e) for e in height.split('-')] # 5-9.5 problem.
+                d['height'] = int(12 * feet + inches)
+
+            elif height.strip() == '':
+                d['height'] = None
+
+        weight = d.get('weight')
+        if type(weight) == str:
+            if weight.strip() == '':
+                w = None
+            else:
+                try:
+                    w = int(weight)
+                except:
+                    import pdb; pdb.set_trace()
+                    w = None
+
+                    
+            d['weight'] = w
+                
+                
+        
+        if 'birthdate' in d:
+            if d['birthdate'].strip():
+                try:
+                    month, day, year = [int(e) for e in d['birthdate'].split('/')]
+                    d['birthdate'] = datetime.datetime(year, month, day)
+                except:
+                    import pdb; pdb.set_trace()
+                    x = 5
 
         self.data.append(d)
 

@@ -114,6 +114,10 @@ class TransactionProcessor(object):
 
 
         if d['type'].strip() != 'trade':
+
+            if 'person' not in d:
+                import pdb; pdb.set_trace()
+
             d2 = {
                 'date': dt,
                 'ttype': d['type'],
