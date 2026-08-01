@@ -589,8 +589,9 @@ class GeneralProcessor(object):
 
         try:
             team1, score, team2 = fields[1:4]
-        except:
-            import pdb; pdb.set_trace()
+        except ValueError:
+            print("Skipping game line with missing fields: %s" % fields)
+            return
 
         score = score.lower().strip()
         minutes = 90
@@ -928,10 +929,7 @@ def process_appearance(s):
 
     else:
 
-        try:
-            starter, subs = s.split("(")
-        except:
-            import pdb; pdb.set_trace()
+        starter, subs = s.split("(", 1)
         subs = subs.replace(")", "")
         sub_items = subs.split(",")
 
