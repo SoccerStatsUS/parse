@@ -226,9 +226,13 @@ class StandingProcessor(object):
         #fields = [e.strip() for e in fields if e.strip()] # Should we really be removing empty fields like this?
         fields = [e.strip() for e in fields]
 
+        # Drop empty fields left by trailing delimiters.
+        if self.key is not None:
+            while len(fields) > len(self.key) and fields[-1] == '':
+                fields.pop()
+
         if self.key is None or len(self.key) != len(fields):
-            # Pause if the key won't work.
-            import pdb; pdb.set_trace() 
+            raise ValueError("Standings key mismatch: key=%s fields=%s line=%r" % (self.key, fields, line))
 
         d = dict(zip(self.key, fields))
 
