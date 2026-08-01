@@ -635,7 +635,7 @@ class GeneralProcessor(object):
             try:
                 team1_score, team2_score = [e.strip() for e in score.split('-')]
             except:
-                import pdb; pdb.set_trace()
+                raise ValueError("Unparseable score %r in fields %s" % (score, fields))
 
             if team1_score in 'wlt':
                 team1_result = team1_score
@@ -644,7 +644,7 @@ class GeneralProcessor(object):
                 try:
                     team1_score = int(team1_score)
                 except:
-                    import pdb; pdb.set_trace()
+                    raise ValueError("Unparseable score %r in fields %s" % (score, fields))
 
             if team2_score in 'wlt':
                 team2_result = team2_score
