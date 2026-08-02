@@ -18,6 +18,7 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 
 - [ ] Undated transactions have no temporal anchor — 41 of 2892 rows (1995 allocations, 2013 retirements); `Season:` is parsed but never reaches the dict, and 6 dated rows contradict their file's season
 - [ ] `usd1_data/data/transactions/mls/team/` is unformatted — `Team:`/`Date:` headers the parser doesn't know, 3 files key on `teams`, 5 have no `Key:`; 2018–2019 load nowhere
+- [ ] Trade rows omit `team_from` (`parse/transactions.py:146`) — other types carry it as `None`; no source file has the column and 3-team trades make it underivable
 
 ## Goal Normalization
 
