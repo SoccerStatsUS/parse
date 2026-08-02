@@ -81,7 +81,7 @@ class StatsProcessor(object):
             return
 
         if line.startswith('Team:'):
-            self.team = line.split('Team:')[1]
+            self.team = line.split('Team:')[1].strip()
             return
 
 
@@ -100,10 +100,10 @@ class StatsProcessor(object):
 
 
         if line.startswith('BlockSource:'):
-            self.source = line.split('BlockSource:')[1]
+            self.source = line.split('BlockSource:')[1].strip()
             return
 
-        fields = line.split(self.delimiter)
+        fields = [e.strip() for e in line.split(self.delimiter)]
 
         try:
             d = dict(zip(self.header, fields))

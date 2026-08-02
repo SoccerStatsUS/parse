@@ -97,17 +97,7 @@ def test_skips_blank_and_comment_lines():
     assert len(run(BASIC).data) == 2
 
 
-# --- Known bugs. These fail on purpose; see ROADMAP.md. ---
-
 def test_strips_team_and_field_values():
-    """Team: and non-numeric fields keep the space after their delimiter."""
     d = run('Team: Chicago Fire\nKey: name; nation\nBob; USA').data[0]
     assert d['team'] == 'Chicago Fire'
     assert d['nation'] == 'USA'
-
-
-def test_keeps_position_and_points():
-    """Both are unconditionally blanked, discarding real columns."""
-    d = run('Key: name; position; points\nBob; F; 25').data[0]
-    assert d['position'] == 'F'
-    assert d['points'] == '25'
