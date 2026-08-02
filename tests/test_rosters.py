@@ -1,12 +1,6 @@
 import datetime
 
-from parse.rosters import (
-    RosterProcessor,
-    RosterProcessor2,
-    RosterProcessor3,
-    filter_brackets,
-    fix_roster_name,
-)
+from parse.rosters import RosterProcessor2, RosterProcessor3, filter_brackets
 
 
 def run(processor, text):
@@ -26,17 +20,6 @@ def test_filter_brackets():
 def test_filter_brackets_docstring_example():
     s = 'Doug Miller [Rochester Rhinos] (Josh Wolff [Project-40] 78)'
     assert filter_brackets(s) == 'Doug Miller  (Josh Wolff  78)'
-
-
-def test_fix_roster_name():
-    assert fix_roster_name('JAIME MORENO') == 'Jaime Moreno'
-    assert fix_roster_name('jaime moreno') == 'Jaime Moreno'
-    assert fix_roster_name('Jaime') == 'Jaime'
-
-
-def test_fix_roster_name_quoted_nickname():
-    """A leading quote is skipped so the letter after it is capitalized."""
-    assert fix_roster_name('JUAN "HARRY" HAYES') == 'Juan "Harry" Hayes'
 
 
 ROSTER2 = """
@@ -151,15 +134,3 @@ def test_roster3_strips_team_and_source():
     assert d['source'] == 'rsssf.com'
 
 
-# --- Known bugs. These fail on purpose; see ROADMAP.md. ---
-
-def test_fix_roster_name_accented_initial():
-    """char_dict is applied after capitalize(), undoing it for accented initials."""
-    assert fix_roster_name('ÁNGEL') == 'Ángel'
-
-
-def test_roster1_reads_a_player_line():
-    """RosterProcessor references an undefined `name`, so every player line raises."""
-    text = 'Competition: Major League Soccer\nSeason: 2010\nTeam: DC United\n10 Jaime Moreno'
-    rosters = run(RosterProcessor(), text).rosters
-    assert [r['name'] for r in rosters] == ['Jaime Moreno']

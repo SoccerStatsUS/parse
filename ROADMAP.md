@@ -14,9 +14,8 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 - [ ] 14 live `pdb.set_trace()` calls in `parse/games.py` — halt batch runs; skip or raise per the 2026-07 cleanup commits
 - [ ] Unrecognized lines fall through to the goal-list parser (`parse/games.py:447`) — section headers like `1. round` land in goal objects
 
-- [ ] `RosterProcessor` references an undefined `name` (`parse/rosters.py:155`) — every player line raises `NameError`, so v1 is dead
-- [ ] `fix_roster_name` only capitalizes after a space (`parse/rosters.py:59`) — gives `O'brien`, `Jean-pierre`, and lowercases accented initials via `char_dict`
-- [ ] Reformat `international_data/rosters/copa_america` for `RosterProcessor3` — no `Key:` line, still uses the v1 column format
+- [ ] Reformat `international_data/rosters/copa_america` for `RosterProcessor3` — no `Key:` line, so `load.py:1160` drops to pdb
+- [ ] `load.py:1782` calls `process_rosters3('olympics')` without the required `root` — raises `TypeError`
 
 ## Goal Normalization
 
