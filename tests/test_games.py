@@ -117,7 +117,6 @@ def test_forfeit():
     g = games[0]
     assert g['competition'] == 'U.S. Open Cup'
     assert g['season'] == '1936'
-    assert g['round'] == 'First Round'
     assert g['group'] == 'Pittsburgh Sector'
     assert g['team1'] == 'Curry Silver Tops'
     assert g['team2'] == 'Kodak Park FC'
@@ -135,6 +134,23 @@ def test_forfeit():
 
     assert g['notes'] == ''
 
+
+HEADER_ORDER = """
+Competition: Olympic Games
+Season: 2012
+Round: Preliminary
+Group: A
+7/26/2012; Great Britain; 1-1; Senegal; Old Trafford
+"""
+
+
+# Known bug; see ROADMAP.md.
+def test_group_header_does_not_clear_round():
+    """Group: clears round, so a Round: written above it is lost."""
+    games, goals, misconduct, appearances, rosters = process_string(HEADER_ORDER)
+    g = games[0]
+    assert g['group'] == 'A'
+    assert g['round'] == 'Preliminary'
 
 
 RED_CARD = """
