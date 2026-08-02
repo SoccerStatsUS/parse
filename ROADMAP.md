@@ -17,6 +17,12 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 - [ ] Reformat `international_data/rosters/copa_america` for `RosterProcessor3` — no `Key:` line, so `load.py:1160` drops to pdb
 - [ ] `load.py:1782` calls `process_rosters3('olympics')` without the required `root` — raises `TypeError`
 
+- [ ] `TransactionProcessor` strips nothing (`parse/transactions.py:92,80`) — every field and `BlockSource:` keeps the space after its delimiter, across all 2892 MLS rows
+- [ ] `Competition:`/`Season:` never reach transaction output (`parse/transactions.py:121`) — parsed onto the processor, dropped from the dict
+- [ ] `Source:`/`Notes:` before the first row raise (`parse/transactions.py:84`) — `current_transaction` is not initialized in `__init__`
+- [ ] `load_transactions()` is a bare `pass` (`build/make/load.py:1115`) — the live path is `load_transactions_standard`, called once for mls
+- [ ] Trade rows carry no `team_from` (`parse/transactions.py:146`) — asymmetric with every other transaction type
+
 ## Goal Normalization
 
 - [ ] No `penalty` / `own_goal` / `own_goal_player` / `unassisted` fields — `pk` and own-goal scorers sit in `assists` as raw strings
@@ -24,7 +30,6 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 ## Test Coverage
 
 - [ ] No tests for `parse/stats.py`
-- [ ] No tests for `parse/transactions.py`
 - [ ] No tests for `parse/export.py`
 - [ ] No export/round-trip tests beyond `test_home_team_export_round_trip`
 - [ ] Shootout parsing untested
