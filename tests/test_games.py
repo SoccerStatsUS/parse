@@ -1,5 +1,6 @@
 import datetime
 
+from parse.export import format_game
 from parse.games import process_string
 
 ASDET = """
@@ -331,4 +332,48 @@ def test_lineups():
     assert appearances[0]['name'] == 'John Wilson'
     assert appearances[1]['name'] == 'Paul Conway'
     assert appearances[2]['name'] == 'Osvaldo Alonso'
+
+
+HOME_TEAM = """
+Competition: Major League Soccer
+Season: 2010
+12/10/2010; Seattle Sounders; 3-1; Real Salt Lake; Real Salt Lake
+12/11/2010; Chicago Fire; 1-1; Toronto FC; home
+12/12/2010; DC United; 0-2; Columbus Crew; away
+12/13/2010; LA Galaxy; 2-0; Chivas USA; neutral
+12/14/2010; Portland Timbers; 1-0; Colorado Rapids; Providence Park
+"""
+
+
+def test_home_team_designators():
+    """A team name, 'home' and 'away' set home_team and leave location empty."""
+    games, goals, misconduct, appearances, rosters = process_string(HOME_TEAM)
+
+    named, home, away, neutral, venue = games
+
+    assert named['home_team'] == 'Real Salt Lake'
+    assert named['location'] == ''
+
+    assert home['home_team'] == 'Chicago Fire'
+    assert home['location'] == ''
+
+    assert away['home_team'] == 'Columbus Crew'
+    assert away['location'] == ''
+
+    # 'neutral' is still left in location; see ROADMAP.md.
+    assert neutral['neutral'] == True
+    assert neutral['home_team'] == None
+
+    assert venue['location'] == 'Providence Park'
+    assert venue['home_team'] == None
+
+
+def test_home_team_export_round_trip():
+    """Clearing location is lossless: the exporter falls back to home_team."""
+    games, goals, misconduct, appearances, rosters = process_string(HOME_TEAM)
+
+    assert format_game(games[0]) == (
+        '12/10/2010; Seattle Sounders; 3-1; Real Salt Lake; Real Salt Lake')
+    assert format_game(games[4]) == (
+        '12/14/2010; Portland Timbers; 1-0; Colorado Rapids; Providence Park')
 

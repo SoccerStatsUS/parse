@@ -703,12 +703,16 @@ class GeneralProcessor(object):
         elif self.away_first and not location:
             home_team = team2
 
+        # A team name, 'home' and 'away' designate the home side rather than
+        # naming a venue; don't leave them in location. The exporter falls back
+        # to home_team, so this round-trips unchanged.
+        # 'neutral' stays put until the exporter can write it back from g['neutral'].
         if location in (team1, team2):
-            home_team = location
+            home_team, location = location, ''
         elif location.lower() == 'home':
-            home_team, location = team1, None
+            home_team, location = team1, ''
         elif location.lower() == 'away':
-            home_team, location = team2, None
+            home_team, location = team2, ''
         elif location.lower() == 'neutral':
             neutral = True
 
