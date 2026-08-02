@@ -279,6 +279,12 @@ class GeneralProcessor(object):
                 self.group = None
             return
 
+        if line.startswith("Region:"):
+            self.group = tag_data(line, "Region:")
+            if self.group.lower() == 'none':
+                self.group = None
+            return
+
 
 
         # current game tags.
