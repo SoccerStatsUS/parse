@@ -14,6 +14,10 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 - [ ] 14 live `pdb.set_trace()` calls in `parse/games.py` — halt batch runs; skip or raise per the 2026-07 cleanup commits
 - [ ] Unrecognized lines fall through to the goal-list parser (`parse/games.py:447`) — section headers like `1. round` land in goal objects
 
+- [ ] `RosterProcessor` references an undefined `name` (`parse/rosters.py:155`) — every player line raises `NameError`, so v1 is dead
+- [ ] `fix_roster_name` only capitalizes after a space (`parse/rosters.py:59`) — gives `O'brien`, `Jean-pierre`, and lowercases accented initials via `char_dict`
+- [ ] `RosterProcessor3` doesn't strip `Team:` or `BlockSource:` (`parse/rosters.py:258,277`) — unlike `Competition:`/`Season:`, so values keep a leading space
+
 ## Goal Normalization
 
 - [ ] No `penalty` / `own_goal` / `own_goal_player` / `unassisted` fields — `pk` and own-goal scorers sit in `assists` as raw strings
@@ -21,7 +25,6 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 ## Test Coverage
 
 - [ ] No tests for `parse/stats.py`
-- [ ] No tests for `parse/rosters.py`
 - [ ] No tests for `parse/transactions.py`
 - [ ] No tests for `parse/export.py`
 - [ ] No export/round-trip tests beyond `test_home_team_export_round_trip`
