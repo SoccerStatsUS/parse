@@ -16,8 +16,8 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 
 - [ ] Reformat `international_data/rosters/copa_america` for `RosterProcessor3` — no `Key:` line, so `load.py:1160` drops to pdb
 
-- [ ] `load_transactions()` is a bare `pass` (`build/make/load.py:1115`) — the live path is `load_transactions_standard`, called once for mls
-- [ ] Trade rows carry no `team_from` (`parse/transactions.py:146`) — asymmetric with every other transaction type
+- [ ] Undated transactions have no temporal anchor — 41 of 2892 rows (1995 allocations, 2013 retirements); `Season:` is parsed but never reaches the dict, and 6 dated rows contradict their file's season
+- [ ] `usd1_data/data/transactions/mls/team/` is unformatted — `Team:`/`Date:` headers the parser doesn't know, 3 files key on `teams`, 5 have no `Key:`; 2018–2019 load nowhere
 
 ## Goal Normalization
 
