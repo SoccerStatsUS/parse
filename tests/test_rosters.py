@@ -136,19 +136,26 @@ def test_roster3_row_shorter_than_key():
     assert 'assists' not in d
 
 
+def test_roster3_strips_field_values():
+    """The olympics roster is padded out with trailing spaces."""
+    d = run(RosterProcessor3(), 'Key: name; club\nFélix Balyu    ;  Daring Brussels ').data[0]
+    assert d['name'] == 'Félix Balyu'
+    assert d['club'] == 'Daring Brussels'
+
+
+def test_roster3_strips_team_and_source():
+    """Team: and BlockSource: strip like Competition: and Season: do."""
+    text = 'BlockSource: rsssf.com\nTeam: DC United\nKey: name\nBob'
+    d = run(RosterProcessor3(), text).data[0]
+    assert d['team'] == 'DC United'
+    assert d['source'] == 'rsssf.com'
+
+
 # --- Known bugs. These fail on purpose; see ROADMAP.md. ---
 
 def test_fix_roster_name_accented_initial():
     """char_dict is applied after capitalize(), undoing it for accented initials."""
     assert fix_roster_name('ÁNGEL') == 'Ángel'
-
-
-def test_roster3_strips_team_and_source():
-    """Team: and BlockSource: are not stripped, unlike Competition: and Season:."""
-    text = 'BlockSource: rsssf.com\nTeam: DC United\nKey: name\nBob'
-    d = run(RosterProcessor3(), text).data[0]
-    assert d['team'] == 'DC United'
-    assert d['source'] == 'rsssf.com'
 
 
 def test_roster1_reads_a_player_line():

@@ -16,7 +16,7 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 
 - [ ] `RosterProcessor` references an undefined `name` (`parse/rosters.py:155`) — every player line raises `NameError`, so v1 is dead
 - [ ] `fix_roster_name` only capitalizes after a space (`parse/rosters.py:59`) — gives `O'brien`, `Jean-pierre`, and lowercases accented initials via `char_dict`
-- [ ] `RosterProcessor3` doesn't strip `Team:` or `BlockSource:` (`parse/rosters.py:258,277`) — unlike `Competition:`/`Season:`, so values keep a leading space
+- [ ] Reformat `international_data/rosters/copa_america` for `RosterProcessor3` — no `Key:` line, still uses the v1 column format
 
 ## Goal Normalization
 
