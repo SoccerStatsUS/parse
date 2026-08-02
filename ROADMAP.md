@@ -18,6 +18,9 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 
 - [ ] Undated transactions have no temporal anchor — 41 of 2892 rows (1995 allocations, 2013 retirements); `Season:` is parsed but never reaches the dict, and 6 dated rows contradict their file's season
 - [ ] `usd1_data/data/transactions/mls/team/` is unformatted — `Team:`/`Date:` headers the parser doesn't know, 3 files key on `teams`, 5 have no `Key:`; 2018–2019 load nowhere
+- [ ] `StatsProcessor` strips nothing (`parse/stats.py:106,84,103`) — same fix already applied to rosters and transactions; leaves tabs in the 2017 stats file
+- [ ] `d['position'] = d['points'] = ''` clobbers real columns (`parse/stats.py:174`) — the identical line is commented out in `rosters.py`
+- [ ] Rewrite `Key:` lines in `usd1_data/data/stats/mls/2017`–`2019` — raw scrape headers yield 0 rows; ~1892 recoverable, then widen the `range(2012, 2017)` loop in `load.py`
 - [ ] Trade rows omit `team_from` (`parse/transactions.py:146`) — other types carry it as `None`; no source file has the column and 3-team trades make it underivable
 
 ## Goal Normalization
@@ -26,7 +29,6 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 
 ## Test Coverage
 
-- [ ] No tests for `parse/stats.py`
 - [ ] No tests for `parse/export.py`
 - [ ] No export/round-trip tests beyond `test_home_team_export_round_trip`
 - [ ] Shootout parsing untested
