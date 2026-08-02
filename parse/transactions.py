@@ -77,7 +77,7 @@ class TransactionProcessor(object):
             return
 
         if line.startswith('BlockSource:'):
-            self.source = line.split('BlockSource:')[1]
+            self.source = line.split('BlockSource:')[1].strip()
             return
 
         if line.startswith("Source:"):
@@ -89,7 +89,7 @@ class TransactionProcessor(object):
             return
 
 
-        fields = line.split(self.delimiter)
+        fields = [e.strip() for e in line.split(self.delimiter)]
 
         try:
             d = dict(zip(self.header, fields))
@@ -131,10 +131,10 @@ class TransactionProcessor(object):
             self.data.append(d2)
 
         else:
-            items = d['person'].split(',')
+            items = [e.strip() for e in d['person'].split(',')]
 
             try:
-                teams = d['team_to'].split(',')
+                teams = [e.strip() for e in d['team_to'].split(',')]
             except:
                 import pdb; pdb.set_trace()
 

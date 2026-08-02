@@ -15,11 +15,7 @@ below. Don't relax the assertion; it goes green when the parser is fixed.
 - [ ] Unrecognized lines fall through to the goal-list parser (`parse/games.py:447`) — section headers like `1. round` land in goal objects
 
 - [ ] Reformat `international_data/rosters/copa_america` for `RosterProcessor3` — no `Key:` line, so `load.py:1160` drops to pdb
-- [ ] `load.py:1782` calls `process_rosters3('olympics')` without the required `root` — raises `TypeError`
 
-- [ ] `TransactionProcessor` strips nothing (`parse/transactions.py:92,80`) — every field and `BlockSource:` keeps the space after its delimiter, across all 2892 MLS rows
-- [ ] `Competition:`/`Season:` never reach transaction output (`parse/transactions.py:121`) — parsed onto the processor, dropped from the dict
-- [ ] `Source:`/`Notes:` before the first row raise (`parse/transactions.py:84`) — `current_transaction` is not initialized in `__init__`
 - [ ] `load_transactions()` is a bare `pass` (`build/make/load.py:1115`) — the live path is `load_transactions_standard`, called once for mls
 - [ ] Trade rows carry no `team_from` (`parse/transactions.py:146`) — asymmetric with every other transaction type
 

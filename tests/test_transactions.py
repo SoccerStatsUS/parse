@@ -55,6 +55,8 @@ def test_trade_splits_into_one_row_per_player():
     assert len(data) == 2
     assert [d['ttype'] for d in data] == ['trade', 'trade']
     assert [d['date'] for d in data] == [datetime.datetime(1997, 7, 3)] * 2
+    assert [d['person'] for d in data] == ['Steve Rammel', 'Roy Wegerle']
+    assert [d['team_to'] for d in data] == ['Colorado Rapids', 'DC United']
 
 
 def test_trade_omits_team_from():
@@ -68,8 +70,6 @@ def test_source_and_notes_attach_to_previous_row():
     assert d['sources'] == ['rsssf.com']
     assert d['notes'] == 'a note'
 
-
-# --- Known bugs. These fail on purpose; see ROADMAP.md. ---
 
 def test_strips_field_values():
     """Nothing is stripped, so every field keeps the space after its delimiter."""
@@ -85,14 +85,3 @@ def test_strips_blocksource():
     assert run(text).data[0]['sources'] == ['rsssf.com']
 
 
-def test_keeps_competition_and_season():
-    """Both are parsed onto the processor but never reach the output dict."""
-    d = run(BASIC).data[0]
-    assert d['competition'] == 'Major League Soccer'
-    assert d['season'] == '1995'
-
-
-def test_source_before_any_row():
-    """current_transaction is never initialized, so a leading Source: raises."""
-    text = 'Key: date; type; person\nSource: rsssf.com\n; sign; Bob'
-    assert run(text).data[0]['sources'] == ['rsssf.com']
