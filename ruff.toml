@@ -1,0 +1,7 @@
+# Names and format strings only -- does this refer to something that doesn't exist?
+# Deliberately not the pycodestyle defaults (~1720 style findings across these
+# repos) and not F401/F841, which are clutter here and unsafe to autofix where
+# imports have side effects.
+
+[lint]
+select = ["F821", "F811", "F502", "F506", "F509", "F522", "F523", "F524"]
