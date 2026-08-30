@@ -141,9 +141,15 @@ class TransactionProcessor(object):
             if len(items) != len(teams):
                 import pdb; pdb.set_trace()
 
-            units = zip(items, teams)
-            
-            l = [{'date': dt, 'ttype': 'trade', 'person': p, 'team_to': t, 'sources': sources} for (p,t) in units]
+            # In a two-team trade each side comes from the other team.
+            # Three-team trades stay None: the file does not say who sent whom.
+            distinct = list(dict.fromkeys(teams))
+            if len(distinct) == 2:
+                other = {distinct[0]: distinct[1], distinct[1]: distinct[0]}
+            else:
+                other = {}
+
+            l = [{'date': dt, 'ttype': 'trade', 'person': p, 'team_to': t, 'team_from': other.get(t), 'sources': sources} for (p,t) in zip(items, teams)]
 
             self.current_transaction = l[-1]
             self.data.extend(l)

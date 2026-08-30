@@ -20,7 +20,6 @@ the Group/Round item below. Don't relax the assertion; it goes green when the pa
 - [ ] `usd1_data/data/transactions/mls/team/` is unformatted — `Team:`/`Date:` headers the parser doesn't know, 3 files key on `teams`, 5 have no `Key:`; 2018–2019 load nowhere
 - [ ] DECIDE: should stats keep `position` and `points`? `parse/stats.py:174` blanks both unconditionally, discarding the real columns in the 2012 and 2016 files; the identical line sits commented out at `rosters.py:348`. Untested until decided
 - [ ] Rewrite `Key:` lines in `usd1_data/data/stats/mls/2017`–`2019` — raw scrape headers yield 0 rows; ~1892 recoverable, then widen the `range(2012, 2017)` loop in `load.py`
-- [ ] Trade rows omit `team_from` (`parse/transactions.py:146`) — other types carry it as `None`; no source file has the column and 3-team trades make it underivable
 
 ## Goal Normalization
 
@@ -32,3 +31,7 @@ the Group/Round item below. Don't relax the assertion; it goes green when the pa
 - [ ] No export/round-trip tests beyond `test_home_team_export_round_trip`
 - [ ] Shootout parsing untested
 - [ ] Standings has one test against one fixture — no alternate delimiters, `Region:`/`Zone:` headers, or malformed rows
+
+## Deferred
+
+- Three-team trades have no `team_from` — one row, and the file does not say which team sent whom

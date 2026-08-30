@@ -59,9 +59,19 @@ def test_trade_splits_into_one_row_per_player():
     assert [d['team_to'] for d in data] == ['Colorado Rapids', 'DC United']
 
 
-def test_trade_omits_team_from():
-    """Unlike every other type, trade rows carry no team_from key at all."""
-    assert 'team_from' not in run(TRADE).data[0]
+def test_two_team_trade_derives_team_from():
+    """Each side of a two-team trade comes from the other team."""
+    assert [d['team_from'] for d in run(TRADE).data] == ['DC United', 'Colorado Rapids']
+
+
+def test_two_team_trade_with_repeated_teams():
+    text = 'Key: date; type; person; team_to\n; trade; A, B, C; X, X, Y'
+    assert [d['team_from'] for d in run(text).data] == ['Y', 'Y', 'X']
+
+
+def test_three_team_trade_has_no_team_from():
+    text = 'Key: date; type; person; team_to\n; trade; A, B, C; X, Y, Z'
+    assert [d['team_from'] for d in run(text).data] == [None, None, None]
 
 
 def test_source_and_notes_attach_to_previous_row():
