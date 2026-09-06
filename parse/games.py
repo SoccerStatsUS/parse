@@ -333,6 +333,20 @@ class GeneralProcessor(object):
             self.current_game['sources'].append(tag_data(line, "Source:"))
             return
 
+        if line.startswith("Home:"):
+            # The source names the home side explicitly (the scraped feeds do).
+            # Only ever written by a converter from such a field; hand files
+            # keep using a team name, 'home' or 'away' in the location slot.
+            home = tag_data(line, "Home:")
+            g = self.current_game
+            if home not in (g['team1'], g['team2']):
+                import pdb; pdb.set_trace()
+                print("Home: %r is neither %r nor %r" % (home, g['team1'], g['team2']))
+                return
+            g['home_team'] = home
+            g['neutral'] = False
+            return
+
         if line.startswith("Weather:"):
             return
 

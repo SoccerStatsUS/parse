@@ -393,3 +393,53 @@ def test_home_team_export_round_trip():
     assert format_game(games[4]) == (
         '12/14/2010; Portland Timbers; 1-0; Colorado Rapids; Providence Park')
 
+
+
+HOME_LINE = """
+Competition: Major League Soccer
+Season: 2025
+2/22/2025; LAFC; 1-0; Minnesota United; BMO Stadium; Guido Gonzales Jr.; 22000
+Home: LAFC
+Source: https://stats-api.mlssoccer.com/matches/MLS-MAT-0009BE
+
+2/23/2025; Inter Miami; 2-2; NYC FC; Chase Stadium
+Home: NYC FC
+
+2/24/2025; Atlanta United; 3-2; CF Montreal; Mercedes-Benz Stadium
+"""
+
+
+def test_home_line_names_the_home_side_alongside_a_venue():
+    games, goals, misconduct, appearances, rosters = process_string(HOME_LINE)
+    first, second, third = games
+
+    assert first['home_team'] == 'LAFC'
+    assert first['location'] == 'BMO Stadium'
+    assert first['neutral'] is False
+    assert first['sources'][-1] == 'https://stats-api.mlssoccer.com/matches/MLS-MAT-0009BE'
+
+    # The line names whichever side the source says, not the first listed.
+    assert second['home_team'] == 'NYC FC'
+
+    # Without the line, a venue alone still says nothing about home.
+    assert third['home_team'] is None
+
+
+def test_home_line_naming_neither_side_is_a_data_warning(monkeypatch):
+    import pdb
+    hits = []
+    monkeypatch.setattr(pdb, 'set_trace', lambda: hits.append(1))
+    text = HOME_LINE.replace('Home: LAFC', 'Home: Seattle Sounders')
+    games = process_string(text)[0]
+    assert hits == [1]
+    assert games[0]['home_team'] is None
+
+
+def test_home_line_export_round_trip():
+    games = process_string(HOME_LINE)[0]
+    assert format_game(games[0]) == (
+        '02/22/2025; LAFC; 1-0; Minnesota United; BMO Stadium; Guido Gonzales Jr.; 22000'
+        '\nHome: LAFC')
+    # A home team that already sits in the location slot needs no extra line.
+    named = process_string(HOME_TEAM)[0][0]
+    assert 'Home:' not in format_game(named)

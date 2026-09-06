@@ -42,6 +42,10 @@ def format_game(g):
     if g['attendance']:
         s += '; %s' % g['attendance']
 
+    # The location slot is taken by a venue, so the home side needs its own line.
+    if g.get('home_team') and location_string != g['home_team']:
+        s += '\nHome: %s' % g['home_team']
+
     return s
 
 
