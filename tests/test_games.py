@@ -256,6 +256,32 @@ def test_blocksource():
     assert g3['sources'] == ['The Bible']
 
 
+BLOCKSOURCE_UNSET = """
+BlockSource: The Bible
+Competition: Ancient Soccer
+Season: -750
+; Reuben; W-L; Simeon; Jahaza
+
+BlockSource:
+; Levi; T-T; Gad; Jazer
+; Benjamin; W-L; Issachar; Jericho
+Source: The Almanac
+"""
+
+
+def test_blocksource_unset():
+    """A BlockSource with no value stops the previous one carrying forward."""
+    games = process_string(BLOCKSOURCE_UNSET)[0]
+
+    assert games[0]['team1'] == 'Reuben'
+    assert games[0]['sources'] == ['The Bible']
+
+    assert games[1]['team1'] == 'Levi'
+    assert games[1]['sources'] == []
+
+    assert games[2]['team1'] == 'Benjamin'
+    assert games[2]['sources'] == ['The Almanac']
+
 
 MINUTES = """
 Competition: International Soccer League

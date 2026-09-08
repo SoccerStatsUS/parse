@@ -351,11 +351,10 @@ class GeneralProcessor(object):
             return
 
 
-        # Should probably be able to unset BlockSource with a blank?
+        # A BlockSource with no value unsets the block source.
         if line.startswith('BlockSource:'):
             source = tag_data(line, "BlockSource:")
-            if source:
-                self.sources = [source]
+            self.sources = [source] if source else []
             return
 
         #if line.startswith("Century"):
