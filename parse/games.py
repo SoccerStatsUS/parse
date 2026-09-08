@@ -811,6 +811,9 @@ class GeneralProcessor(object):
             line = line[:-1]
 
         team, players = line.split(":", 1)
+        if not players.strip():
+            return []
+
         lineups = []
 
         # Separate ,; to represent defenders/midfielders/etc.

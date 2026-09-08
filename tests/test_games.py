@@ -283,6 +283,24 @@ def test_blocksource_unset():
     assert games[2]['sources'] == ['The Almanac']
 
 
+EMPTY_LINEUP = """
+Competition: Ancient Soccer
+Season: -750
+
+; Reuben; 1-0; Simeon; Jahaza
+Reuben:
+Simeon: Adam; Seth, Enos
+"""
+
+
+def test_empty_lineup_produces_no_appearances():
+    """A team line with nothing after the colon is not an unnamed player."""
+    appearances = process_string(EMPTY_LINEUP)[3]
+
+    assert [a['name'] for a in appearances] == ['Adam', 'Seth', 'Enos']
+    assert {a['team'] for a in appearances} == {'Simeon'}
+
+
 MINUTES = """
 Competition: International Soccer League
 Season: 1963
