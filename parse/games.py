@@ -807,7 +807,7 @@ class GeneralProcessor(object):
 
         # Remove trailing marks.
         line = line.strip()
-        if line[-1] in ('.', ','):
+        if line[-1] in ('.', ',', ';'):
             line = line[:-1]
 
         team, players = line.split(":", 1)
