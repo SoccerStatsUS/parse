@@ -54,5 +54,5 @@ def test_a_list_without_revenue_columns(tmp_path):
 
 
 def test_wrong_field_count_names_the_line(tmp_path):
-    with pytest.raises(ValueError, match=r'list:10'):
+    with pytest.raises(ValueError, match=r'list:9'):
         run(tmp_path, SPORTICO + "2; LA Galaxy\n")
