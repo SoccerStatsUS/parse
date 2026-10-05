@@ -47,3 +47,12 @@ def test_keys_with_spaces_become_underscores(tmp_path):
 def test_wrong_field_count_names_the_line(tmp_path):
     with pytest.raises(ValueError, match=r'f:6'):
         run(tmp_path, FEES + "Austin FC; 2019\n")
+
+
+def test_net_worth_is_a_number(tmp_path):
+    (tmp_path / 'net-worth').write_text(
+        "Competition: Major League Soccer\n"
+        "Key: club; owner; year; net worth; publisher; sources\n\n"
+        "Atlanta United; Arthur Blank; 2024; 9200000000; Forbes; https://a.example\n")
+    row = process_ownership('net-worth', str(tmp_path))[0]
+    assert (row['owner'], row['year'], row['net_worth'], row['publisher']) == ('Arthur Blank', 2024, 9200000000, 'Forbes')

@@ -1,12 +1,12 @@
 import os
 
 
-NUMBERS = ('year', 'start', 'end', 'awarded', 'first season', 'price', 'valuation', 'fee')
+NUMBERS = ('year', 'start', 'end', 'awarded', 'first season', 'price', 'valuation', 'fee', 'net worth')
 
 
 def process_ownership(fn, root):
     """
-    Read an ownership file (operators, sales or expansion fees): a Competition
+    Read an ownership file (operators, sales, expansion fees or net worths): a Competition
     header, a Key line naming the fields, then one row per record. Years and
     amounts are integers, an empty field is None, the note is a string and the
     sources are split on whitespace. Keys with spaces become underscores.
