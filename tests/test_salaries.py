@@ -49,6 +49,7 @@ def test_full_row(tmp_path):
         'season': '2007',
         'source': 'http://example.com/salaries: 2007',
         'period': 'year',
+        'coverage': 'full',
     }
 
 
@@ -78,3 +79,13 @@ def test_period_header(tmp_path):
 def test_wrong_field_count_names_the_line(tmp_path):
     with pytest.raises(ValueError, match=r'salaries:7'):
         run(tmp_path, BARE + "Carlos 44625 Mendes; 44625; 44625\n")
+
+
+def test_coverage_defaults_to_full_and_reported_salaries_carry_their_own_source(tmp_path):
+    (tmp_path / '1975').write_text(
+        "Competition: North American Soccer League\nSeason: 1975\nCoverage: reported\nKey: team; name; base\n\n"
+        "Source: https://a.example\nNew York Cosmos; Pelé; 1670000\n"
+        "Source: https://b.example\nDallas Tornado; Kyle Rote Jr.; 7000\n")
+    rows = process_salaries('1975', str(tmp_path))
+    assert [(r['name'], r['source'], r['coverage']) for r in rows] == [
+        ('Pelé', 'https://a.example', 'reported'), ('Kyle Rote Jr.', 'https://b.example', 'reported')]
