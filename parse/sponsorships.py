@@ -4,7 +4,7 @@ import os
 # Header lines that apply to every row beneath them.
 HEADERS = ('Competition', 'Kind')
 
-NUMBERS = ('start', 'end', 'annual', 'total')
+NUMBERS = ('start', 'end', 'length', 'annual', 'total')
 
 
 def process_sponsorships(fn, root):
