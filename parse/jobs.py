@@ -42,6 +42,8 @@ def process_jobs(fn, root):
         d = {k: v or None for k, v in zip(key, fields)}
         if d['role'] not in ROLES:
             raise ValueError("%s:%s: role %r is not one of %s" % (path, number, d['role'], ROLES))
+        if d['start'] is None:
+            raise ValueError("%s:%s: a job needs a start" % (path, number))
         for k in ('start', 'end'):
             if d[k] is not None and not DATE.match(d[k]):
                 raise ValueError("%s:%s: %s %r is not YYYY-MM-DD, YYYY-MM or YYYY" % (path, number, k, d[k]))

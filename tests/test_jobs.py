@@ -45,3 +45,8 @@ def test_an_unknown_role_raises(tmp_path):
 def test_a_date_in_another_format_raises(tmp_path):
     with pytest.raises(ValueError, match='10/30/1997'):
         run(tmp_path, JOBS.replace('1997-10-30', '10/30/1997'))
+
+
+def test_a_job_without_a_start_raises(tmp_path):
+    with pytest.raises(ValueError, match='needs a start'):
+        run(tmp_path, JOBS.replace('Head Coach; 1997-10-30;', 'Head Coach; ;'))
