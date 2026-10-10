@@ -394,6 +394,19 @@ def test_lineups():
     assert appearances[2]['name'] == 'Osvaldo Alonso'
 
 
+SUB_CHAIN = """
+Competition: American Soccer League
+Season: 1925
+10/3/1925; Brooklyn Wanderers; 1-0; Fall River Marksmen
+Brooklyn Wanderers: Smith, Morris (McManus, Burness)
+"""
+
+def test_sub_chain_without_minutes():
+    games, goals, misconduct, appearances, rosters = process_string(SUB_CHAIN)
+    names = [a['name'] for a in appearances]
+    assert names == ['Smith', 'Morris', 'McManus', 'Burness']
+
+
 HOME_TEAM = """
 Competition: Major League Soccer
 Season: 2010

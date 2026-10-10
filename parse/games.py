@@ -972,7 +972,7 @@ def process_appearance(s):
             else:
                 #print("No minute for sub %s" % s)
                 minute = None
-                sub = clean_name(sub_items[0])
+                sub = clean_name(item)
 
             l[-1]['off'] = minute
             l.append({'name': sub, 'on': minute})
